@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - Sushi Tapas Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .qr-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .qr-section h2 {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .url-display {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        .qr-code {
+            margin: 20px 0;
+        }
+        .generate-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .generate-btn:hover {
+            background-color: #45a049;
+        }
+        .instructions {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .instructions h3 {
+            color: #1976D2;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍣 QR Code Generator for Menu</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>First, you'll need to upload this website to GitHub Pages</li>
+                <li>Replace "YOUR-USERNAME" and "YOUR-REPO" in the URLs below with your actual GitHub username and repository name</li>
+                <li>Click the "Generate QR Code" buttons to create QR codes for each menu</li>
+                <li>Right-click on the generated QR codes and save them as images</li>
+                <li>Print the QR codes and place them at restaurant tables</li>
+            </ol>
+        </div>
+        
+        <div class="qr-section">
+            <h2>Main Menu QR Code</h2>
+            <div class="url-display" id="mainMenuUrl">
+                https://YOUR-USERNAME.github.io/YOUR-REPO/menu.html
+            </div>
+            <button class="generate-btn" onclick="generateQR('mainMenuUrl', 'mainMenuQR')">Generate QR Code</button>
+            <div class="qr-code" id="mainMenuQR"></div>
+        </div>
+        
+        <div class="qr-section">
+            <h2>Special Menu QR Code</h2>
+            <div class="url-display" id="specialMenuUrl">
+                https://YOUR-USERNAME.github.io/YOUR-REPO/special.html
+            </div>
+            <button class="generate-btn" onclick="generateQR('specialMenuUrl', 'specialMenuQR')">Generate QR Code</button>
+            <div class="qr-code" id="specialMenuQR"></div>
+        </div>
+        
+        <div class="qr-section">
+            <h2>Home Page QR Code</h2>
+            <div class="url-display" id="homePageUrl">
+                https://YOUR-USERNAME.github.io/YOUR-REPO/
+            </div>
+            <button class="generate-btn" onclick="generateQR('homePageUrl', 'homePageQR')">Generate QR Code</button>
+            <div class="qr-code" id="homePageQR"></div>
+        </div>
+    </div>
+    
+    <script>
+        function generateQR(urlElementId, qrElementId) {
+            const url = document.getElementById(urlElementId).textContent.trim();
+            const qrContainer = document.getElementById(qrElementId);
+            
+            // Clear previous QR code
+            qrContainer.innerHTML = '';
+            
+            // Create QR code using Google Charts API
+            const qrSize = 300;
+            const qrUrl = `https://chart.googleapis.com/chart?chs=${qrSize}x${qrSize}&cht=qr&chl=${encodeURIComponent(url)}`;
+            
+            const img = document.createElement('img');
+            img.src = qrUrl;
+            img.alt = 'QR Code';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            
+            qrContainer.appendChild(img);
+            
+            // Add download link
+            const downloadLink = document.createElement('a');
+            downloadLink.href = qrUrl;
+            downloadLink.download = `qr-code-${qrElementId}.png`;
+            downloadLink.textContent = 'Download QR Code';
+            downloadLink.style.display = 'block';
+            downloadLink.style.marginTop = '10px';
+            downloadLink.style.color = '#4CAF50';
+            downloadLink.style.textDecoration = 'none';
+            
+            qrContainer.appendChild(downloadLink);
+        }
+    </script>
+</body>
+</html>

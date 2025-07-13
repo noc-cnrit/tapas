@@ -45,6 +45,22 @@
         .drinks-section {
             margin-bottom: 30px;
         }
+        .menu-section {
+            margin-bottom: 40px;
+        }
+        .menu-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .menu-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+            margin: 0 auto;
+        }
         .drink-category {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -95,6 +111,9 @@
             .drink-category {
                 grid-template-columns: 1fr;
             }
+            .menu-image {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -104,17 +123,18 @@
         
         <h1>🍺 Drinks Menu</h1>
         
-        <div class="coming-soon">
-            <h2>🚧 Coming Soon!</h2>
-            <p>We're currently working on our exciting drinks menu featuring:</p>
-            <ul style="text-align: left; display: inline-block; color: #856404;">
-                <li>Premium Sake Selection</li>
-                <li>Japanese Whisky & Spirits</li>
-                <li>Craft Cocktails & Specialty Drinks</li>
-                <li>Wine & Beer Pairings</li>
-                <li>Non-Alcoholic Options</li>
-            </ul>
-            <p><strong>Check back soon for our full beverage offerings!</strong></p>
+        <div class="menu-section">
+            <h2>🍺 Drinks Menu - Page 1</h2>
+            <div class="menu-container">
+                <img src="images/menus/Drinks.png" alt="Drinks Menu Page 1" class="menu-image">
+            </div>
+        </div>
+        
+        <div class="menu-section">
+            <h2>🍸 Drinks Menu - Page 2</h2>
+            <div class="menu-container">
+                <img src="images/menus/Drinks2.png" alt="Drinks Menu Page 2" class="menu-image">
+            </div>
         </div>
         
         <!-- Future drink menu content will go here -->

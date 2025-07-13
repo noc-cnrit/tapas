@@ -60,12 +60,94 @@
             text-align: center;
             margin-top: 20px;
         }
+        /* Modal Popup Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .clickable-area {
+            position: absolute;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 3px;
+            transition: border-color 0.2s;
+        }
+        
+        .clickable-area:hover {
+            border-color: #2196F3;
+            background-color: rgba(33, 150, 243, 0.1);
+        }
+        
+        .menu-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .menu-instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            color: #1976d2;
+        }
+        
         @media (max-width: 800px) {
             .container {
                 padding: 10px;
             }
             .menu-image {
                 max-width: 100%;
+            }
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 15px;
             }
         }
     </style>
@@ -76,19 +158,83 @@
         
         <h1>🍣 Complete Menu</h1>
         
+        <div class="menu-instructions">
+            💡 <strong>Tip:</strong> Click on menu items to see food photos!
+        </div>
+        
         <div class="menu-section">
             <h2>🍣 Main Menu</h2>
             <div class="menu-container">
-                <img src="images/menus/MenuPage2SushiTapas-1.png" alt="Main Menu" class="menu-image">
+                <img src="images/menus/MenuPage2SushiTapas-1.png" alt="Main Menu" class="menu-image" id="main-menu-img">
+                <!-- Sample clickable areas - these coordinates would need to be adjusted based on actual menu layout -->
+                <div class="clickable-area" style="top: 15%; left: 10%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3471.jpeg.jpg', 'Fresh Sushi Selection')"></div>
+                <div class="clickable-area" style="top: 25%; left: 10%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3472.jpeg.jpg', 'Tapas Platter')"></div>
+                <div class="clickable-area" style="top: 35%; left: 10%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3821.jpg', 'Premium Selection')"></div>
+                <div class="clickable-area" style="top: 45%; left: 10%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3475.jpeg.jpg', 'Special Rolls')"></div>
+                <div class="clickable-area" style="top: 55%; left: 10%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3477.jpeg.jpg', 'Signature Dishes')"></div>
+                
+                <!-- Right column items -->
+                <div class="clickable-area" style="top: 15%; left: 55%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3478.jpg', 'Delicious Appetizers')"></div>
+                <div class="clickable-area" style="top: 25%; left: 55%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3479.jpeg.jpg', 'Specialty Items')"></div>
+                <div class="clickable-area" style="top: 35%; left: 55%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3481.jpeg.jpg', 'Chef Special')"></div>
+                <div class="clickable-area" style="top: 45%; left: 55%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3483.jpeg.jpg', 'Traditional Favorites')"></div>
+                <div class="clickable-area" style="top: 55%; left: 55%; width: 35%; height: 8%;" onclick="showFoodImage('images/food/IMG_3485.jpeg.jpg', 'House Specialties')"></div>
             </div>
         </div>
         
         <div class="menu-section">
             <h2>🍤 Special Menu</h2>
             <div class="menu-container">
-                <img src="images/menus/Scan2025-07-12_201937-1.png" alt="Special Menu" class="menu-image">
+                <img src="images/menus/Scan2025-07-12_201937-1.png" alt="Special Menu" class="menu-image" id="special-menu-img">
+                <!-- Sample clickable areas for special menu -->
+                <div class="clickable-area" style="top: 20%; left: 15%; width: 70%; height: 10%;" onclick="showFoodImage('images/food/IMG_3486.jpeg.jpg', 'Special Sushi Combo')"></div>
+                <div class="clickable-area" style="top: 35%; left: 15%; width: 70%; height: 10%;" onclick="showFoodImage('images/food/IMG_3490.jpeg.jpg', 'Premium Sashimi')"></div>
+                <div class="clickable-area" style="top: 50%; left: 15%; width: 70%; height: 10%;" onclick="showFoodImage('images/food/IMG_3822.jpeg.jpg', 'Chef\'s Special')"></div>
+                <div class="clickable-area" style="top: 65%; left: 15%; width: 70%; height: 10%;" onclick="showFoodImage('images/food/IMG_3825.jpeg.jpg', 'Seasonal Special')"></div>
+                <div class="clickable-area" style="top: 80%; left: 15%; width: 70%; height: 10%;" onclick="showFoodImage('images/food/IMG_3826.jpeg.jpg', 'Deluxe Platter')"></div>
+            </div>
+        </div>
+        
+        <!-- Modal for displaying food images -->
+        <div id="foodModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <img id="modalImage" class="modal-image" src="" alt="">
+                <h3 id="modalTitle"></h3>
             </div>
         </div>
     </div>
+    
+    <script>
+        function showFoodImage(imagePath, title) {
+            const modal = document.getElementById('foodModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            modalImage.src = imagePath;
+            modalImage.alt = title;
+            modalTitle.textContent = title;
+            
+            modal.style.display = 'block';
+            
+            // Add click outside to close
+            modal.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+        
+        function closeModal() {
+            document.getElementById('foodModal').style.display = 'none';
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -76,6 +76,40 @@
             font-weight: bold;
             color: #333;
         }
+        .website-url {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                font-size: 12pt;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+                max-width: none;
+            }
+            .menu-button {
+                border: 2px solid #333;
+                background-color: transparent !important;
+                color: #333 !important;
+                padding: 10px 20px;
+                display: inline-block;
+                margin: 5px;
+            }
+            .dish-preview {
+                break-inside: avoid;
+                margin-bottom: 15px;
+            }
+            .featured-dishes {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -96,11 +130,11 @@
             <a href="menu-combined.html" class="menu-button">View Complete Menu</a>
             <a href="drinks.html" class="menu-button" style="background-color: #9C27B0;">Drinks Menu</a>
             <a href="gallery.html" class="menu-button" style="background-color: #E91E63;">Food Gallery</a>
-            <a href="qr-codes.html" class="menu-button" style="background-color: #FF9800;">View QR Codes</a>
         </div>
         
         <div class="menu-section">
-            <p>Scan the QR code at your table or click the buttons above to view our delicious menu options!</p>
+            <p>Visit our website to explore our full menu of delicious sushi, tapas, and refreshing drinks!</p>
+            <p class="website-url">platestpete.com</p>
         </div>
         
         <div class="menu-section">

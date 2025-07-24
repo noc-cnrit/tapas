@@ -37,11 +37,16 @@ function custom_fdm_popup_styles() {
         return;
     }
     
+    // Check if ordering is enabled and the plugin scripts are loaded
+    if (!wp_script_is('fdm-ordering-js', 'enqueued') && !wp_script_is('fdm-ordering-js', 'registered')) {
+        return; // Don't load if the plugin isn't loading its scripts
+    }
+    
     // Enqueue our custom popup CSS with high priority
     wp_enqueue_style(
         'fdm-popup-custom',
         get_stylesheet_directory_uri() . '/fdm-popup-custom.css',
-        array('fdm-base'), // Load after plugin's base CSS
+        array('fdm-ordering-css'), // Load after plugin's ordering CSS
         wp_get_theme()->get('Version'),
         'all'
     );
@@ -56,3 +61,33 @@ function custom_fdm_popup_styles() {
     );
 }
 add_action('wp_enqueue_scripts', 'custom_fdm_popup_styles', 999); // High priority to override plugin styles
+
+/**
+ * Alternative method: Load styles unconditionally but with proper dependencies
+ * Use this if the above method doesn't work
+ */
+function custom_fdm_popup_styles_fallback() {
+    if (is_admin()) {
+        return;
+    }
+    
+    // Load our CSS (it will only apply if the popup exists)
+    wp_enqueue_style(
+        'fdm-popup-custom-fallback',
+        get_stylesheet_directory_uri() . '/fdm-popup-custom.css',
+        array(), // No dependencies, just load it
+        wp_get_theme()->get('Version') . '-fallback',
+        'all'
+    );
+    
+    // Load our JS with jQuery dependency only
+    wp_enqueue_script(
+        'fdm-popup-enhancements-fallback',
+        get_stylesheet_directory_uri() . '/fdm-popup-enhancements.js',
+        array('jquery'), // Only depend on jQuery
+        wp_get_theme()->get('Version') . '-fallback',
+        true
+    );
+}
+// Uncomment the line below if the main function doesn't work:
+// add_action('wp_enqueue_scripts', 'custom_fdm_popup_styles_fallback', 999);

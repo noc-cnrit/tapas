@@ -4,6 +4,11 @@
  * Plate St. Pete - Sushi Tapas Restaurant
  */
 
+// Disable caching during development
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 // Enable error reporting for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -42,7 +47,34 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Plate St. Pete</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Authentic Japanese sushi and fusion cuisine in St. Petersburg, Florida. Fresh sashimi, creative rolls, and innovative fusion dishes. Dine-in and takeout available.">
+    <meta name="keywords" content="sushi, sashimi, Japanese restaurant, fusion cuisine, St. Petersburg, Florida, fresh fish, rolls, Japanese cuisine">
+    <meta name="author" content="Plate Sushi St. Pete">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://platestpete.com/">
+    <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete">
+    <meta property="og:description" content="Authentic Japanese sushi and fusion cuisine in St. Petersburg, Florida. Fresh sashimi, creative rolls, and innovative fusion dishes.">
+    <meta property="og:image" content="https://platestpete.com/images/og-image.jpg">
+    <meta property="og:site_name" content="Plate Sushi St. Pete">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://platestpete.com/">
+    <meta property="twitter:title" content="<?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete">
+    <meta property="twitter:description" content="Authentic Japanese sushi and fusion cuisine in St. Petersburg, Florida. Fresh sashimi, creative rolls, and innovative fusion dishes.">
+    <meta property="twitter:image" content="https://platestpete.com/images/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     
     <style>
         :root {
@@ -83,11 +115,15 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
         
         .hero-section {
             text-align: center;
-            padding: 40px 30px;
-            background: linear-gradient(135deg, var(--primary-color), #66BB6A);
+            padding: 80px 30px;
+            background: url('images/plate sushi rainbow roll.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: white;
             border-radius: var(--border-radius);
             margin: -20px -20px 30px -20px;
+            position: relative;
         }
         
         .hero-section h1 {
@@ -636,8 +672,8 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
 <body>
     <div class="container">
         <div class="hero-section">
-            <h1>🍣 Plate St. Pete 🍤</h1>
-            <div class="tagline">Authentic Sushi & Asian Tapas Experience</div>
+            <h1>Plate Sushi St. Pete</h1>
+            <div class="tagline">Authentic Sushi & Fusion Tapas Experience</div>
             <div class="location">St. Petersburg, Florida</div>
         </div>
         
@@ -750,7 +786,7 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
         
         <div class="restaurant-info">
             <div class="website-url">Plate Sushi St. Pete</div>
-            <p>Experience authentic Asian flavors with our carefully crafted sushi and tapas selections.</p>
+            <p>Experience authentic flavors with our carefully crafted sushi and fusion cuisine selections.</p>
             <p>Fresh ingredients • Traditional techniques • Modern presentation</p>
         </div>
     </div>

@@ -1,199 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Codes - Sushi Tapas Menu</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .back-button {
-            display: inline-block;
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .back-button:hover {
-            background-color: #1976D2;
-        }
-        .qr-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            margin-top: 30px;
-        }
-        .qr-card {
-            background-color: #fff;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .qr-card h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 24px;
-        }
-        .qr-card img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .qr-url {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
-            margin-bottom: 15px;
-            color: #666;
-        }
-        .print-instructions {
-            background-color: #e7f3ff;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 30px;
-            border-left: 4px solid #2196F3;
-        }
-        .print-instructions h3 {
-            color: #1976D2;
-            margin-top: 0;
-        }
-        .print-instructions ul {
-            color: #333;
-            line-height: 1.6;
-        }
-        .download-all {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .download-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            margin: 5px;
-            display: inline-block;
-        }
-        .download-btn:hover {
-            background-color: #45a049;
-        }
-        .usage-tips {
-            background-color: #fff3cd;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 30px;
-            border-left: 4px solid #ffc107;
-        }
-        .usage-tips h3 {
-            color: #856404;
-            margin-top: 0;
-        }
-        @media print {
-            body {
-                background-color: white;
-            }
-            .container {
-                box-shadow: none;
-                max-width: none;
-            }
-            .back-button, .print-instructions, .download-all, .usage-tips {
-                display: none;
-            }
-            .qr-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-            }
-        }
-        @media (max-width: 768px) {
-            .qr-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <a href="index.html" class="back-button">← Back to Main Menu</a>
-        
-        <h1>🍣 QR Codes for Menu Access</h1>
-        
-        <div class="print-instructions">
-            <h3>📄 Printing Instructions:</h3>
-            <ul>
-                <li>Use <strong>Ctrl+P</strong> (Windows) or <strong>Cmd+P</strong> (Mac) to print this page</li>
-                <li>Set printer to <strong>Color</strong> for best results</li>
-                <li>Use <strong>A4 or Letter size</strong> paper</li>
-                <li>Print at <strong>100% scale</strong> (no scaling)</li>
-                <li>Cut out individual QR codes and place at restaurant tables</li>
-            </ul>
-        </div>
-        
-        <div class="download-all">
-            <a href="images/qr-codes/qr_code_home.png" download class="download-btn">Download Home QR</a>
-            <a href="images/qr-codes/qr_code_main_menu.png" download class="download-btn">Download Complete Menu QR</a>
-            <a href="images/qr-codes/qr_code_special_menu.png" download class="download-btn">Download Drinks Menu QR</a>
-        </div>
-        
-        <div class="qr-grid">
-            <div class="qr-card">
-                <h2>🍣 Main Website</h2>
-                <img src="images/qr-codes/qr_code_home.png" alt="Home QR Code">
-                <div class="qr-url">https://platestpete.com/</div>
-                <p>General landing page with all menu options</p>
-            </div>
-            
-            <div class="qr-card">
-                <h2>🍣 Complete Menu</h2>
-                <img src="images/qr-codes/qr_code_main_menu.png" alt="Complete Menu QR Code">
-                <div class="qr-url">https://platestpete.com/menu-combined.html</div>
-                <p>Full menu with both main dishes and specials</p>
-            </div>
-            
-            <div class="qr-card">
-                <h2>🍺 Drinks Menu</h2>
-                <img src="images/qr-codes/qr_code_special_menu.png" alt="Drinks Menu QR Code">
-                <div class="qr-url">https://platestpete.com/drinks.html</div>
-                <p>Beverage menu and drink specials</p>
-            </div>
-        </div>
-        
-        <div class="usage-tips">
-            <h3>💡 Usage Tips:</h3>
-            <ul>
-                <li><strong>Table Placement:</strong> Place QR codes in small frames or laminate them for durability</li>
-                <li><strong>Size:</strong> Each QR code is optimized for easy scanning from 6-12 inches away</li>
-                <li><strong>Testing:</strong> Test each QR code with your phone before placing at tables</li>
-                <li><strong>Multiple Codes:</strong> Consider placing different QR codes at different tables (main menu at dinner tables, specials at bar)</li>
-                <li><strong>Backup:</strong> Always have a few physical menus available for customers who prefer them</li>
-            </ul>
-        </div>
-    </div>
-</body>
-</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Codes - Sushi Tapas Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .back-button {
+            display: inline-block;
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #1976D2;
+        }
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 30px;
+        }
+        .qr-card {
+            background-color: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .qr-card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .qr-card img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .qr-url {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        .print-instructions {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 4px solid #2196F3;
+        }
+        .print-instructions h3 {
+            color: #1976D2;
+            margin-top: 0;
+        }
+        .print-instructions ul {
+            color: #333;
+            line-height: 1.6;
+        }
+        .download-all {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .download-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 5px;
+            display: inline-block;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+        .usage-tips {
+            background-color: #fff3cd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+            border-left: 4px solid #ffc107;
+        }
+        .usage-tips h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        @media print {
+            body {
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            .back-button, .print-instructions, .download-all, .usage-tips {
+                display: none;
+            }
+            .qr-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+        @media (max-width: 768px) {
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-button">← Back to Main Menu</a>
+        
+        <h1>🍣 QR Codes for Menu Access</h1>
+        
+        <div class="print-instructions">
+            <h3>📄 Printing Instructions:</h3>
+            <ul>
+                <li>Use <strong>Ctrl+P</strong> (Windows) or <strong>Cmd+P</strong> (Mac) to print this page</li>
+                <li>Set printer to <strong>Color</strong> for best results</li>
+                <li>Use <strong>A4 or Letter size</strong> paper</li>
+                <li>Print at <strong>100% scale</strong> (no scaling)</li>
+                <li>Cut out individual QR codes and place at restaurant tables</li>
+            </ul>
+        </div>
+        
+        <div class="download-all">
+            <a href="images/qr-codes/qr_code_home.png" download class="download-btn">Download Home QR</a>
+            <a href="images/qr-codes/qr_code_main_menu.png" download class="download-btn">Download Complete Menu QR</a>
+            <a href="images/qr-codes/qr_code_special_menu.png" download class="download-btn">Download Drinks Menu QR</a>
+        </div>
+        
+        <div class="qr-grid">
+            <div class="qr-card">
+                <h2>🍣 Main Website</h2>
+                <img src="images/qr-codes/qr_code_home.png" alt="Home QR Code">
+                <div class="qr-url">https://platestpete.com/</div>
+                <p>General landing page with all menu options</p>
+            </div>
+            
+            <div class="qr-card">
+                <h2>🍣 Complete Menu</h2>
+                <img src="images/qr-codes/qr_code_main_menu.png" alt="Complete Menu QR Code">
+                <div class="qr-url">https://platestpete.com/menu-combined.html</div>
+                <p>Full menu with both main dishes and specials</p>
+            </div>
+            
+            <div class="qr-card">
+                <h2>🍺 Drinks Menu</h2>
+                <img src="images/qr-codes/qr_code_special_menu.png" alt="Drinks Menu QR Code">
+                <div class="qr-url">https://platestpete.com/drinks.html</div>
+                <p>Beverage menu and drink specials</p>
+            </div>
+        </div>
+        
+        <div class="usage-tips">
+            <h3>💡 Usage Tips:</h3>
+            <ul>
+                <li><strong>Table Placement:</strong> Place QR codes in small frames or laminate them for durability</li>
+                <li><strong>Size:</strong> Each QR code is optimized for easy scanning from 6-12 inches away</li>
+                <li><strong>Testing:</strong> Test each QR code with your phone before placing at tables</li>
+                <li><strong>Multiple Codes:</strong> Consider placing different QR codes at different tables (main menu at dinner tables, specials at bar)</li>
+                <li><strong>Backup:</strong> Always have a few physical menus available for customers who prefer them</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

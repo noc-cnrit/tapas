@@ -292,10 +292,8 @@ try {
         
         <div class="nav-links">
             <a href="index.php">← Admin Dashboard</a>
-            <a href="../index.php">View Menu</a>
             <a href="menus.php">Manage Menus</a>
             <a href="items.php">Manage Items</a>
-            <a href="import.php">Import Data</a>
             <a href="login.php?logout=1">Logout</a>
         </div>
 
@@ -501,12 +499,16 @@ try {
             }
             
             // Save handler
-            saveBtn.addEventListener('click', function() {
+            saveBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 saveEdit(field, fieldType, sectionId, input.value, originalHTML);
             });
             
             // Cancel handler
-            cancelBtn.addEventListener('click', function() {
+            cancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 cancelEdit(field, originalHTML);
             });
             

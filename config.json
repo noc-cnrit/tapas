@@ -1,0 +1,48 @@
+{
+  "project": {
+    "name": "Tapas Restaurant Website",
+    "description": "Menu display system with image galleries and lightbox popups",
+    "local_path": "D:\\CNR\\PlateStPete\\tapas"
+  },
+  "database": {
+    "host": "198.12.124.45",
+    "username": "platestpete_usr",
+    "password": "Pl@te$tPete2024!",
+    "database": "platestpete_db",
+    "port": 3306,
+    "connection_string": "mysql:host=198.12.124.45:3306;dbname=platestpete_db"
+  },
+  "ftp": {
+    "host": "198.12.124.45",
+    "username": "plate@platestpete.com",
+    "password": "Evou1$@4@*c2",
+    "root_path": "/platestpete.com/public_html/",
+    "port": 21
+  },
+  "wordpress": {
+    "uploads_path": "wp/wp-content/uploads/",
+    "extracted_to": "images/food/",
+    "notes": "Images extracted from WordPress uploads and organized by dish names"
+  },
+  "development": {
+    "local_server": "http://localhost/tapas/",
+    "testing_complete": true,
+    "features": [
+      "Menu display with categories",
+      "AJAX-powered lightbox popups",
+      "Image galleries with thumbnail navigation",
+      "Database-integrated menu items",
+      "WordPress image extraction and matching"
+    ]
+  },
+  "deployment": {
+    "status": "ready_for_upload",
+    "files_to_deploy": [
+      "index.php",
+      "get_item_details.php",
+      "database/",
+      "images/",
+      "README.md"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-# Plate St. Pete Tapas Menu System
+# Plate St. Pete Fusion Menu System
 
 A comprehensive restaurant menu management system with admin panel, dietary icons, and QR code generation for easy customer access.
 
@@ -54,7 +54,7 @@ A comprehensive restaurant menu management system with admin panel, dietary icon
 
 ### 1. Create GitHub Repository
 1. Go to [GitHub](https://github.com) and create a new repository
-2. Name it something like `sushi-tapas-menu` or `restaurant-menu`
+2. Name it something like `sushi-fusion-menu` or `restaurant-menu`
 3. Make sure it's public (required for GitHub Pages)
 
 ### 2. Upload Files

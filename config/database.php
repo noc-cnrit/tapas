@@ -8,16 +8,16 @@
 $db_config = [
     // Local development settings
     'local' => [
-        'host' => 'localhost',
-        'database' => 'tapas_menu',
-        'username' => 'root',
-        'password' => '',
+        'host' => '35.212.92.200',
+        'database' => 'dblplzygqhkye4',
+        'username' => 'urhgsgyruysgz',
+        'password' => 'pcyjeilfextq',
         'charset' => 'utf8mb4'
     ],
     
     // SiteGround production settings
     'production' => [
-        'host' => '35.212.92.200', // SiteGround server IP
+        'host' => '127.0.0.1', // SiteGround server IP
         'database' => 'dblplzygqhkye4', // Menu system database
         'username' => 'urhgsgyruysgz',
         'password' => 'pcyjeilfextq',
@@ -29,19 +29,16 @@ $db_config = [
 $isCli = php_sapi_name() === 'cli';
 $httpHost = $isCli ? 'localhost' : ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
-// FORCE PRODUCTION DATABASE - Switch to SiteGround
-$environment = 'production';
-
-// Original auto-detection code (commented out)
-// $environment = (strpos($httpHost, 'localhost') !== false || 
-//                 strpos($httpHost, '127.0.0.1') !== false) ? 'local' : 'production';
+// Auto-detect environment based on host
+$environment = (strpos($httpHost, 'localhost') !== false || 
+                strpos($httpHost, '127.0.0.1') !== false) ? 'local' : 'production';
 
 // Get current environment config
 $config = $db_config[$environment];
 
 // Database connection function
 function getDBConnection() {
-    global $config;
+    global $config, $environment;
     
     try {
         $dsn = "mysql:host={$config['host']};dbname={$config['database']};charset={$config['charset']}";

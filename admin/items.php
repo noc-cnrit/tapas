@@ -29,9 +29,10 @@ if ($_POST) {
                     break;
                 case 'edit':
                     // Debug: Show what icons were received
-                    $iconDebug = isset($_POST['icons']) ? implode(', ', $_POST['icons']) : 'No icons';
+                    $iconDebug = isset($_POST['icons']) ? implode(', ', $_POST['icons']) : 'No icons selected';
+                    error_log("Edit action - POST data: " . print_r($_POST, true));
                     updateMenuItem($pdo, $_POST);
-                    $message = "Menu item updated successfully! Icons received: " . $iconDebug;
+                    $message = "Menu item updated successfully! Icons: " . $iconDebug;
                     break;
                 case 'toggle_hidden':
                     toggleItemVisibility($pdo, $_POST['item_id']);
@@ -41,10 +42,34 @@ if ($_POST) {
                     deleteMenuItem($pdo, $_POST['item_id']);
                     $message = "Menu item deleted successfully!";
                     break;
+                case 'inline_edit':
+                    updateInlineField($pdo, $_POST['item_id'], $_POST['field'], $_POST['value']);
+                    echo 'success';
+                    exit;
+                    break;
+                case 'toggle_icon':
+                    error_log("Toggle icon - POST data: " . print_r($_POST, true));
+                    toggleIcon($pdo, $_POST['item_id'], $_POST['icon_key'], $_POST['checked'] === 'true');
+                    echo 'success';
+                    exit;
+                    break;
+                case 'get_item_icons':
+                    getItemIconsForRefresh($pdo, $_POST['item_id']);
+                    exit;
+                    break;
+                case 'get_item_data':
+                    getItemDataForEdit($pdo, $_POST['item_id']);
+                    exit;
+                    break;
             }
         }
     } catch (Exception $e) {
         $error = "Error: " . $e->getMessage();
+        error_log("Exception in items.php: " . $e->getMessage());
+        if (isset($_POST['action']) && $_POST['action'] === 'toggle_icon') {
+            echo 'error: ' . $e->getMessage();
+            exit;
+        }
     }
 }
 
@@ -122,16 +147,8 @@ function updateMenuItem($pdo, $data) {
         $data['item_id']
     ]);
     
-    // Update icons
-    // First delete existing icons
-    $pdo->prepare("DELETE FROM menu_item_icons WHERE item_id = ?")->execute([$data['item_id']]);
-    
-    // Then add new ones - Debug logging
-    if (isset($data['icons'])) {
-        if (is_array($data['icons']) && !empty($data['icons'])) {
-            saveItemIcons($pdo, $data['item_id'], $data['icons']);
-        }
-    }
+    // Note: Icons are handled separately via real-time AJAX calls
+    // No icon processing here to avoid overriding real-time changes
 }
 
 function saveItemIcons($pdo, $itemId, $icons) {
@@ -169,6 +186,80 @@ function deleteMenuItem($pdo, $itemId) {
     $stmt->execute([$itemId]);
 }
 
+function updateInlineField($pdo, $itemId, $field, $value) {
+    $allowedFields = ['section_id' => 'section', 'name' => 'name', 'price' => 'price'];
+    
+    if ($field === 'section') {
+        $field = 'section_id';
+    }
+    
+    if (!array_key_exists($field, $allowedFields)) {
+        throw new Exception("Invalid field: $field");
+    }
+    
+    // Validate the value based on field type
+    if ($field === 'price' && !is_numeric($value)) {
+        throw new Exception("Price must be a number");
+    }
+    
+    if ($field === 'section_id' && !is_numeric($value)) {
+        throw new Exception("Invalid section ID");
+    }
+    
+    $sql = "UPDATE menu_items SET $field = ? WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$value, $itemId]);
+}
+
+function toggleIcon($pdo, $itemId, $iconKey, $isChecked) {
+    // Define available icons within the function
+    $availableIcons = [
+        'has_image' => ['name' => 'Has Photo', 'icon' => '📷', 'type' => 'special'],
+        'vegetarian' => ['name' => 'Vegetarian', 'icon' => '🌱', 'type' => 'dietary'],
+        'vegan' => ['name' => 'Vegan', 'icon' => '🌿', 'type' => 'dietary'],
+        'gluten_free' => ['name' => 'Gluten-Free', 'icon' => '🌾', 'type' => 'dietary'],
+        'spicy' => ['name' => 'Spicy', 'icon' => '🌶️', 'type' => 'spice'],
+        'popular' => ['name' => 'Popular', 'icon' => '⭐', 'type' => 'award'],
+        'new' => ['name' => 'New Item', 'icon' => '✨', 'type' => 'special'],
+        'chef_special' => ['name' => 'Chef\'s Special', 'icon' => '👨‍🍳', 'type' => 'special']
+    ];
+    
+    if (!isset($availableIcons[$iconKey])) {
+        throw new Exception("Invalid icon key: $iconKey");
+    }
+    
+    if ($isChecked) {
+        // Add the icon if it doesn't exist
+        $checkSql = "SELECT COUNT(*) FROM menu_item_icons WHERE item_id = ? AND icon_name = ?";
+        $checkStmt = $pdo->prepare($checkSql);
+        $checkStmt->execute([$itemId, $iconKey]);
+        
+        if ($checkStmt->fetchColumn() == 0) {
+            $icon = $availableIcons[$iconKey];
+            $maxOrderSql = "SELECT COALESCE(MAX(display_order), 0) + 1 FROM menu_item_icons WHERE item_id = ?";
+            $maxOrderStmt = $pdo->prepare($maxOrderSql);
+            $maxOrderStmt->execute([$itemId]);
+            $nextOrder = $maxOrderStmt->fetchColumn();
+            
+            $insertSql = "INSERT INTO menu_item_icons (item_id, icon_type, icon_name, icon_path, tooltip_text, display_order) VALUES (?, ?, ?, ?, ?, ?)";
+            $insertStmt = $pdo->prepare($insertSql);
+            $insertStmt->execute([
+                $itemId,
+                $icon['type'],
+                $iconKey,
+                null,
+                $icon['name'],
+                $nextOrder
+            ]);
+        }
+    } else {
+        // Remove the icon
+        $deleteSql = "DELETE FROM menu_item_icons WHERE item_id = ? AND icon_name = ?";
+        $deleteStmt = $pdo->prepare($deleteSql);
+        $deleteStmt->execute([$itemId, $iconKey]);
+    }
+}
+
 function getMenuItemById($pdo, $itemId) {
     $sql = "SELECT i.*, s.name as section_name, m.name as menu_name,
             GROUP_CONCAT(ic.icon_name ORDER BY ic.display_order) as item_icons
@@ -194,8 +285,8 @@ function getMenuItemById($pdo, $itemId) {
 
 function getAllMenuItems($pdo) {
     $sql = "SELECT i.*, s.name as section_name, m.name as menu_name,
-            GROUP_CONCAT(ic.icon_name) as item_icons,
-            COUNT(img.id) as image_count
+            GROUP_CONCAT(DISTINCT ic.icon_name ORDER BY ic.display_order) as item_icons,
+            COUNT(DISTINCT img.id) as image_count
             FROM menu_items i
             JOIN menu_sections s ON i.section_id = s.id
             JOIN menus m ON s.menu_id = m.id
@@ -250,6 +341,55 @@ function getAllMenusAndSections($pdo) {
     }
     
     return array_values($menus);
+}
+
+function getItemIconsForRefresh($pdo, $itemId) {
+    // Define available icons within the function
+    $availableIcons = [
+        'has_image' => ['name' => 'Has Photo', 'icon' => '📷', 'type' => 'special'],
+        'vegetarian' => ['name' => 'Vegetarian', 'icon' => '🌱', 'type' => 'dietary'],
+        'vegan' => ['name' => 'Vegan', 'icon' => '🌿', 'type' => 'dietary'],
+        'gluten_free' => ['name' => 'Gluten-Free', 'icon' => '🌾', 'type' => 'dietary'],
+        'spicy' => ['name' => 'Spicy', 'icon' => '🌶️', 'type' => 'spice'],
+        'popular' => ['name' => 'Popular', 'icon' => '⭐', 'type' => 'award'],
+        'new' => ['name' => 'New Item', 'icon' => '✨', 'type' => 'special'],
+        'chef_special' => ['name' => 'Chef\'s Special', 'icon' => '👨‍🍳', 'type' => 'special']
+    ];
+    
+    $sql = "SELECT icon_name FROM menu_item_icons WHERE item_id = ? ORDER BY display_order";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$itemId]);
+    $iconNames = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    $icons = [];
+    foreach ($iconNames as $iconName) {
+        if (isset($availableIcons[$iconName])) {
+            $icons[] = [
+                'name' => $availableIcons[$iconName]['name'],
+                'icon' => $availableIcons[$iconName]['icon']
+            ];
+        }
+    }
+    
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'icons' => $icons]);
+}
+
+function getItemDataForEdit($pdo, $itemId) {
+    $item = getMenuItemById($pdo, $itemId);
+    if ($item) {
+        // Convert boolean values for JavaScript
+        $item['is_available'] = (bool)$item['is_available'];
+        $item['is_featured'] = (bool)$item['is_featured'];
+        $item['is_hidden'] = (bool)$item['is_hidden'];
+        $item['appears_on_specials'] = (bool)$item['appears_on_specials'];
+        
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'item' => $item]);
+    } else {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'error' => 'Item not found']);
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -505,6 +645,27 @@ function getAllMenusAndSections($pdo) {
             font-weight: bold;
             color: #28a745;
         }
+        .editable {
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        .editable:hover {
+            background-color: #f8f9fa;
+            border: 1px dashed #007bff;
+        }
+        .editable input, .editable select {
+            width: 100%;
+            border: 1px solid #007bff;
+            padding: 4px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .inline-editing {
+            background-color: #fff3cd !important;
+            border: 1px solid #ffc107 !important;
+        }
     </style>
 </head>
 <body>
@@ -513,9 +674,8 @@ function getAllMenusAndSections($pdo) {
         
         <div class="nav-links">
             <a href="index.php">← Admin Dashboard</a>
-            <a href="../index.php">View Menu</a>
+            <a href="menus.php">Manage Menus</a>
             <a href="sections.php">Manage Sections</a>
-            <a href="import.php">Import Data</a>
             <a href="login.php?logout=1">Logout</a>
         </div>
 
@@ -546,15 +706,17 @@ function getAllMenusAndSections($pdo) {
                 <?php foreach ($items as $item): ?>
                     <tr>
                         <td><strong><?= htmlspecialchars($item['menu_name']) ?></strong></td>
-                        <td><?= htmlspecialchars($item['section_name']) ?></td>
                         <td>
-                            <?= htmlspecialchars($item['name']) ?>
+                            <span class="editable" data-type="section" data-id="<?= $item['id'] ?>" data-section-id="<?= $item['section_id'] ?>"><?= htmlspecialchars($item['section_name']) ?></span>
+                        </td>
+                        <td>
+                            <span class="editable" data-type="name" data-id="<?= $item['id'] ?>"><?= htmlspecialchars($item['name']) ?></span>
                             <?php if ($item['appears_on_specials']): ?>
                                 <span class="status-badge status-featured" title="Shows in Chef's Specials">CHEF'S SPECIAL</span>
                             <?php endif; ?>
                         </td>
                         <td class="price">
-                            <?= $item['price'] ? '$' . number_format($item['price'], 2) : '-' ?>
+                            $<span class="editable" data-type="price" data-id="<?= $item['id'] ?>"><?= $item['price'] ? number_format($item['price'], 2) : '0.00' ?></span>
                         </td>
                         <td>
                             <?php if ($item['is_hidden']): ?>
@@ -576,7 +738,7 @@ function getAllMenusAndSections($pdo) {
                         </td>
                         <td><?= $item['image_count'] ?> images</td>
                         <td>
-                            <a href="?edit=<?= $item['id'] ?>" class="action-btn btn-edit">Edit</a>
+                            <button onclick="openEditModal(<?= $item['id'] ?>); return false;" class="action-btn btn-edit">Edit</button>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="action" value="toggle_hidden">
                                 <input type="hidden" name="item_id" value="<?= $item['id'] ?>">
@@ -708,8 +870,161 @@ function getAllMenusAndSections($pdo) {
         
         function closeModal() {
             document.getElementById('itemModal').style.display = 'none';
+            // Refresh the icons in the main table if we were editing an item
+            const itemId = document.getElementById('itemId').value;
+            if (itemId) {
+                refreshItemIcons(itemId);
+            }
         }
         
+        function refreshItemIcons(itemId) {
+            // Send AJAX request to get updated item data
+            const formData = new FormData();
+            formData.append('action', 'get_item_icons');
+            formData.append('item_id', itemId);
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Find the row for this item and update the icons column
+                    const rows = document.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const editLink = row.querySelector('a[href*="edit=' + itemId + '"]');
+                        if (editLink) {
+                            const iconsCell = row.cells[5]; // Icons column (0-indexed)
+                            const iconsDiv = iconsCell.querySelector('.icons');
+                            
+                            // Clear existing icons
+                            iconsDiv.innerHTML = '';
+                            
+                            // Add updated icons
+                            data.icons.forEach(iconData => {
+                                const iconSpan = document.createElement('span');
+                                iconSpan.className = 'icon';
+                                iconSpan.title = iconData.name;
+                                iconSpan.textContent = iconData.icon;
+                                iconsDiv.appendChild(iconSpan);
+                            });
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error refreshing icons:', error);
+            });
+        }
+        
+        function openEditModal(itemId) {
+            const formData = new FormData();
+            formData.append('action', 'get_item_data');
+            formData.append('item_id', itemId);
+
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const item = data.item;
+
+                    openModal('edit', item.id);
+
+                    document.getElementById('menu_section').value = item.section_id;
+                    document.getElementById('name').value = item.name;
+                    document.getElementById('description').value = item.description || '';
+                    document.getElementById('price').value = item.price || '';
+                    document.getElementById('dietary_info').value = item.dietary_info || '';
+                    document.getElementById('display_order').value = item.display_order || 0;
+                    document.getElementById('is_available').checked = item.is_available;
+                    document.getElementById('is_featured').checked = item.is_featured;
+                    document.getElementById('is_hidden').checked = item.is_hidden;
+                    document.getElementById('appears_on_specials').checked = item.appears_on_specials;
+
+                    // Set icons
+                    document.querySelectorAll('input[name="icons[]"]').forEach(checkbox => {
+                        checkbox.checked = item.icons.includes(checkbox.value);
+                    });
+
+                    // Remove name attributes to prevent them from submitting and add event listeners
+                    document.querySelectorAll('input[name="icons[]"]').forEach(checkbox => {
+                        checkbox.removeAttribute('name');
+                        
+                        // Add real-time icon update listener
+                        checkbox.addEventListener('change', function() {
+                            const iconKey = this.value;
+                            const isChecked = this.checked;
+                            
+                            // Send AJAX request to toggle icon immediately
+                            const formData = new FormData();
+                            formData.append('action', 'toggle_icon');
+                            formData.append('item_id', item.id);
+                            formData.append('icon_key', iconKey);
+                            formData.append('checked', isChecked);
+                            
+                            fetch(window.location.href, {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.text())
+                            .then(data => {
+                                console.log('Response:', data); // Debug logging
+                                if (!data.includes('success')) {
+                                    // Revert checkbox if failed
+                                    this.checked = !isChecked;
+                                    alert('Failed to update icon! Response: ' + data);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                // Revert checkbox if failed
+                                this.checked = !isChecked;
+                                alert('An error occurred updating the icon.');
+                            });
+                        });
+                    });
+
+                } else {
+                    alert('Failed to load item data: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading item data:', error);
+                alert('An error occurred while loading item data.');
+            })
+        }
+
+        // Handle form submission via AJAX to prevent page reload
+        document.getElementById('itemForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const formData = new FormData(this);
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Close the modal
+                closeModal();
+                
+                // Show success message (you could parse the response to get the actual message)
+                alert('Menu item saved successfully!');
+                
+                // Reload the page to show updated data
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the menu item.');
+            });
+        });
+
         // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('itemModal');
@@ -735,7 +1050,7 @@ function getAllMenusAndSections($pdo) {
                 document.getElementById('is_hidden').checked = <?= $editItem['is_hidden'] ? 'true' : 'false' ?>;
                 document.getElementById('appears_on_specials').checked = <?= $editItem['appears_on_specials'] ? 'true' : 'false' ?>;
                 
-                // Check icons
+                // Check icons and add real-time update listeners
                 <?php if ($editItem): ?>
                     const itemIcons = <?= json_encode($editItem['icons']) ?>;
                     itemIcons.forEach(iconKey => {
@@ -745,8 +1060,177 @@ function getAllMenusAndSections($pdo) {
                         }
                     });
                 <?php endif; ?>
+                
+                // Add real-time icon update listeners
+                const itemId = <?= $editItem['id'] ?>;
+                document.querySelectorAll('input[name="icons[]"]').forEach(checkbox => {
+                    // Remove the name attribute so these checkboxes won't be submitted with the form
+                    checkbox.removeAttribute('name');
+                    
+                    checkbox.addEventListener('change', function() {
+                        const iconKey = this.value;
+                        const isChecked = this.checked;
+                        
+                        // Send AJAX request to toggle icon immediately
+                        const formData = new FormData();
+                        formData.append('action', 'toggle_icon');
+                        formData.append('item_id', itemId);
+                        formData.append('icon_key', iconKey);
+                        formData.append('checked', isChecked);
+                        
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            console.log('Response:', data); // Debug logging
+                            if (!data.includes('success')) {
+                                // Revert checkbox if failed
+                                this.checked = !isChecked;
+                                alert('Failed to update icon! Response: ' + data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Revert checkbox if failed
+                            this.checked = !isChecked;
+                            alert('An error occurred updating the icon.');
+                        });
+                    });
+                });
             });
         <?php endif; ?>
+        
+        // Inline editing functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menus = <?= json_encode($menus) ?>;
+            
+            document.querySelectorAll('.editable').forEach(function(element) {
+                element.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent page from scrolling to the top
+                    if (this.querySelector('input, select')) {
+                        return; // Already editing
+                    }
+                    
+                    const type = this.getAttribute('data-type');
+                    const id = this.getAttribute('data-id');
+                    const currentValue = this.textContent.trim();
+                    
+                    this.classList.add('inline-editing');
+                    
+                    if (type === 'section') {
+                        const currentSectionId = this.getAttribute('data-section-id');
+                        const select = document.createElement('select');
+                        
+                        menus.forEach(menu => {
+                            const optgroup = document.createElement('optgroup');
+                            optgroup.label = menu.name;
+                            
+                            menu.sections.forEach(section => {
+                                const option = document.createElement('option');
+                                option.value = section.id;
+                                option.textContent = section.name;
+                                if (section.id == currentSectionId) {
+                                    option.selected = true;
+                                }
+                                optgroup.appendChild(option);
+                            });
+                            
+                            select.appendChild(optgroup);
+                        });
+                        
+                        this.innerHTML = '';
+                        this.appendChild(select);
+                        select.focus();
+                        
+                        select.addEventListener('blur', () => saveInlineEdit(this, type, id, select.value));
+                        select.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                saveInlineEdit(this, type, id, select.value);
+                            } else if (e.key === 'Escape') {
+                                cancelInlineEdit(this, currentValue);
+                            }
+                        });
+                        
+                    } else {
+                        const input = document.createElement('input');
+                        input.type = type === 'price' ? 'number' : 'text';
+                        if (type === 'price') {
+                            input.step = '0.01';
+                            input.min = '0';
+                        }
+                        input.value = currentValue;
+                        
+                        this.innerHTML = '';
+                        this.appendChild(input);
+                        input.focus();
+                        input.select();
+                        
+                        input.addEventListener('blur', () => saveInlineEdit(this, type, id, input.value));
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                saveInlineEdit(this, type, id, input.value);
+                            } else if (e.key === 'Escape') {
+                                cancelInlineEdit(this, currentValue);
+                            }
+                        });
+                    }
+                });
+            });
+            
+            function saveInlineEdit(element, type, id, value) {
+                element.classList.remove('inline-editing');
+                
+                // Send AJAX request to update
+                const formData = new FormData();
+                formData.append('action', 'inline_edit');
+                formData.append('item_id', id);
+                formData.append('field', type);
+                formData.append('value', value);
+                
+                fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data.includes('error')) {
+                        alert('Update failed!');
+                        location.reload(); // Reload to show original value
+                    } else {
+                        // Update display value
+                        if (type === 'section') {
+                            // Find section name from menus data
+                            let sectionName = value;
+                            menus.forEach(menu => {
+                                menu.sections.forEach(section => {
+                                    if (section.id == value) {
+                                        sectionName = section.name;
+                                        element.setAttribute('data-section-id', value);
+                                    }
+                                });
+                            });
+                            element.textContent = sectionName;
+                        } else if (type === 'price') {
+                            element.textContent = parseFloat(value).toFixed(2);
+                        } else {
+                            element.textContent = value;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during the update.');
+                    location.reload();
+                });
+            }
+            
+            function cancelInlineEdit(element, originalValue) {
+                element.classList.remove('inline-editing');
+                element.textContent = originalValue;
+            }
+        });
     </script>
 </body>
 </html>

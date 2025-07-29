@@ -43,6 +43,9 @@ class Auth {
     public static function login($username, $password) {
         self::startSession();
         
+        // Load persistent user data
+        self::loadUserData();
+        
         if (!isset(self::$users[$username])) {
             return false;
         }
@@ -135,7 +138,7 @@ class Auth {
     /**
      * Require authentication - redirect to login if not authenticated
      */
-    public static function requireAuth($redirectTo = '/tapas/admin/login.php') {
+    public static function requireAuth($redirectTo = 'login.php') {
         if (!self::isAuthenticated()) {
             header('Location: ' . $redirectTo);
             exit;
@@ -197,16 +200,19 @@ class Auth {
     }
     
     /**
-     * Change user password (Note: In production, this should update a database)
+     * Change user password with file persistence
      */
     public static function changePassword($username, $newPassword) {
         if (isset(self::$users[$username])) {
             // Hash the new password
             $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
             
-            // Update user data (in production, this would update database)
+            // Update user data in memory
             self::$users[$username]['password'] = $hashedPassword;
             self::$users[$username]['force_password_change'] = false;
+            
+            // Save to file for persistence
+            self::saveUserData($username, $hashedPassword, false);
             
             // Update session
             self::startSession();
@@ -215,6 +221,49 @@ class Auth {
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Save user data to file for persistence
+     */
+    private static function saveUserData($username, $passwordHash, $forcePasswordChange) {
+        $userFile = __DIR__ . '/../admin/.users.json';
+        
+        // Load existing data
+        $userData = [];
+        if (file_exists($userFile)) {
+            $userData = json_decode(file_get_contents($userFile), true) ?: [];
+        }
+        
+        // Update user data
+        $userData[$username] = [
+            'password' => $passwordHash,
+            'force_password_change' => $forcePasswordChange,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        
+        // Save to file
+        file_put_contents($userFile, json_encode($userData, JSON_PRETTY_PRINT));
+        chmod($userFile, 0600); // Restrict file permissions
+    }
+    
+    /**
+     * Load user data from file
+     */
+    private static function loadUserData() {
+        $userFile = __DIR__ . '/../admin/.users.json';
+        
+        if (file_exists($userFile)) {
+            $userData = json_decode(file_get_contents($userFile), true) ?: [];
+            
+            // Merge with default users
+            foreach ($userData as $username => $data) {
+                if (isset(self::$users[$username])) {
+                    self::$users[$username]['password'] = $data['password'];
+                    self::$users[$username]['force_password_change'] = $data['force_password_change'];
+                }
+            }
+        }
     }
 }
 ?>

@@ -122,14 +122,38 @@ function getMenuById($pdo, $menuId) {
 function getAllMenus($pdo) {
     $sql = "SELECT m.*, 
             COUNT(s.id) as section_count,
-            COUNT(CASE WHEN s.is_active = 1 THEN 1 END) as active_sections
+            COUNT(CASE WHEN s.is_active = 1 THEN 1 END) as active_sections,
+            GROUP_CONCAT(
+                CONCAT(s.name, '|', s.is_active) 
+                ORDER BY s.display_order, s.name 
+                SEPARATOR ';;'
+            ) as section_details
             FROM menus m
             LEFT JOIN menu_sections s ON m.id = s.menu_id
             GROUP BY m.id
             ORDER BY m.display_order, m.name";
     
     $stmt = $pdo->query($sql);
-    return $stmt->fetchAll();
+    $menus = $stmt->fetchAll();
+    
+    // Process section details for each menu
+    foreach ($menus as &$menu) {
+        $menu['sections'] = [];
+        if ($menu['section_details']) {
+            $sections = explode(';;', $menu['section_details']);
+            foreach ($sections as $section) {
+                if ($section) {
+                    list($name, $is_active) = explode('|', $section);
+                    $menu['sections'][] = [
+                        'name' => $name,
+                        'is_active' => (bool)$is_active
+                    ];
+                }
+            }
+        }
+    }
+    
+    return $menus;
 }
 ?>
 <!DOCTYPE html>
@@ -290,6 +314,41 @@ function getAllMenus($pdo) {
             font-size: 0.9em;
             color: #666;
         }
+        .section-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .section-tag {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+        .section-tag.active {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .section-tag.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .section-icon {
+            font-size: 0.8em;
+        }
+        .sections-summary {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
+        }
         
         /* Modal styles */
         .modal {
@@ -379,10 +438,8 @@ function getAllMenus($pdo) {
         
         <div class="nav-links">
             <a href="index.php">← Admin Dashboard</a>
-            <a href="../index.php">View Menu</a>
-            <a href="items.php">Manage Items</a>
             <a href="sections.php">Manage Sections</a>
-            <a href="import.php">Import Data</a>
+            <a href="items.php">Manage Items</a>
             <a href="login.php?logout=1">Logout</a>
         </div>
 
@@ -427,10 +484,24 @@ function getAllMenus($pdo) {
                         </td>
                         <td><strong><?= htmlspecialchars($menu['name']) ?></strong></td>
                         <td><?= htmlspecialchars($menu['description'] ?: 'No description') ?></td>
-                        <td class="section-count">
-                            <?= $menu['section_count'] ?> sections
-                            <?php if ($menu['active_sections'] != $menu['section_count']): ?>
-                                <br><small>(<?= $menu['active_sections'] ?> active)</small>
+                        <td>
+                            <?php if (!empty($menu['sections'])): ?>
+                                <div class="section-tags">
+                                    <?php foreach ($menu['sections'] as $section): ?>
+                                        <span class="section-tag <?= $section['is_active'] ? 'active' : 'inactive' ?>">
+                                            <span class="section-icon"><?= $section['is_active'] ? '●' : '○' ?></span>
+                                            <?= htmlspecialchars($section['name']) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="sections-summary">
+                                    <?= $menu['section_count'] ?> sections
+                                    <?php if ($menu['active_sections'] != $menu['section_count']): ?>
+                                        (<?= $menu['active_sections'] ?> active)
+                                    <?php endif; ?>
+                                </div>
+                            <?php else: ?>
+                                <span class="section-count">No sections</span>
                             <?php endif; ?>
                         </td>
                         <td>

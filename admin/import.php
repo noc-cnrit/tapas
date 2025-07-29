@@ -92,9 +92,9 @@ require_once '../database/import_csv.php';
         
         <div class="nav-links">
             <a href="index.php">← Admin Dashboard</a>
-            <a href="../index.php">View Menu</a>
-            <a href="items.php">Manage Items</a>
+            <a href="menus.php">Manage Menus</a>
             <a href="sections.php">Manage Sections</a>
+            <a href="items.php">Manage Items</a>
             <a href="login.php?logout=1">Logout</a>
         </div>
         

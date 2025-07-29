@@ -206,14 +206,6 @@ if (Auth::isAuthenticated()) {
         <div class="back-link">
             <a href="../index.php">← Back to Menu</a>
         </div>
-        
-        <div class="credentials-info">
-            <strong>Available Users:</strong><br>
-            • <strong>admin</strong> / password: <strong>password</strong><br>
-            • <strong>manager</strong> / password: <strong>password</strong><br>
-            • <strong>plateadmin</strong> / password: <em>(blank - will prompt to set)</em><br>
-            <small>Change default passwords in production!</small>
-        </div>
     </div>
 </body>
 </html>

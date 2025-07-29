@@ -294,17 +294,6 @@ try {
             </div>
             
             <div class="admin-card">
-                <div class="card-header items">
-                    <div class="card-icon">🍽️</div>
-                    <div class="card-title">Menu Items</div>
-                    <div class="card-description">Add, edit, and manage individual menu items, prices, and descriptions</div>
-                </div>
-                <div class="card-body">
-                    <a href="items.php" class="card-link">Manage Items</a>
-                </div>
-            </div>
-            
-            <div class="admin-card">
                 <div class="card-header sections">
                     <div class="card-icon">📋</div>
                     <div class="card-title">Menu Sections</div>
@@ -312,6 +301,17 @@ try {
                 </div>
                 <div class="card-body">
                     <a href="sections.php" class="card-link">Manage Sections</a>
+                </div>
+            </div>
+            
+            <div class="admin-card">
+                <div class="card-header items">
+                    <div class="card-icon">🍽️</div>
+                    <div class="card-title">Menu Items</div>
+                    <div class="card-description">Add, edit, and manage individual menu items, prices, and descriptions</div>
+                </div>
+                <div class="card-body">
+                    <a href="items.php" class="card-link">Manage Items</a>
                 </div>
             </div>
             

@@ -116,6 +116,10 @@ pip install qrcode[pil]
 - **📋 Menu Management** - Create and manage multiple menus
 - **📝 Section Management** - Add, edit, and organize menu sections
 - **🍽️ Item Management** - Full CRUD operations for menu items
+- **✏️ Quick Edit Links** - Convenient edit buttons on menu items for logged-in admins
+  - Hover-activated edit links with pencil emoji
+  - Open in new tab without losing browsing context
+  - Only visible to authenticated admin users
 - **🏷️ Dietary Icons** - Assign dietary restriction icons to menu items
 - **📊 Import/Export** - CSV import functionality for bulk menu updates
 - **👤 User Management** - Password change functionality

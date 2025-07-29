@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2025-01-29
+
+### Added
+- **Admin Edit Links**: Added convenient "Edit" links on menu items for logged-in admin users
+  - Small green pill-shaped buttons with pencil emoji (✏️ Edit)
+  - Appear on hover over menu items
+  - Open in new tab to admin edit page without losing menu browsing context
+  - Only visible to authenticated admin users
+  - Implemented for both server-rendered and JavaScript-rendered menu items
+
+### Fixed
+- **Session Header Warnings**: Resolved "headers already sent" warnings in admin authentication
+  - Moved authentication checks earlier in script execution
+  - Stored authentication status in variable to avoid multiple Auth calls after output
+  - Fixed admin edit links to use correct URL path (`admin/items.php?edit=` instead of non-existent `admin/edit_item.php`)
+- **Admin Success Popup**: Removed intrusive "Menu item saved successfully!" popup alert
+  - Admin interface now provides visual feedback through page reload and updated data display
+  - Cleaner user experience without disruptive popup messages
+
+### Technical Improvements
+- **Authentication Optimization**: Reduced redundant Auth class method calls
+- **URL Correction**: Fixed admin edit link paths to match actual file structure
+- **User Experience**: Improved admin workflow by removing unnecessary popup interruptions
+
 ## [2.0.0] - 2025-01-28
 
 ### Added

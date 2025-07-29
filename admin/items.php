@@ -1013,9 +1013,6 @@ function getItemDataForEdit($pdo, $itemId) {
                 // Close the modal
                 closeModal();
                 
-                // Show success message (you could parse the response to get the actual message)
-                alert('Menu item saved successfully!');
-                
                 // Reload the page to show updated data
                 location.reload();
             })

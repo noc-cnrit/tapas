@@ -2,6 +2,16 @@
 /**
  * Dynamic Menu Display Page
  * Plate St. Pete - Sushi Tapas Restaurant
+ * 
+ * Copyright (c) 2025 Computer Networking Resources (CNR)
+ * Savannah, Georgia
+ * Website: https://cnrit.com
+ * 
+ * All rights reserved. This software and associated documentation files
+ * are the proprietary property of CNR. Unauthorized reproduction or 
+ * distribution of this program, or any portion of it, may result in 
+ * severe civil and criminal penalties, and will be prosecuted to the 
+ * maximum extent possible under the law.
  */
 
 // Disable caching during development
@@ -15,6 +25,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'classes/MenuDAO.php';
+require_once 'classes/Auth.php';
 
 // Initialize data access object
 $menuDAO = new MenuDAO();
@@ -41,6 +52,9 @@ $menuNames = $menuDAO->getMenuNames();
 
 // Get featured items for the main page
 $featuredItems = $menuDAO->getFeaturedItems(4);
+
+// Check authentication status for use throughout the page
+$isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -198,6 +212,44 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             box-shadow: var(--hover-shadow);
         }
         
+        .chefs-specials {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .chefs-specials .menu-header {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            border-bottom: 3px solid #e74c3c;
+        }
+        
+        .chefs-specials .menu-title {
+            color: white;
+        }
+        
+        .chefs-specials .menu-description {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .chefs-specials .section-title {
+            color: #ecf0f1;
+        }
+        
+        .chefs-specials .section-description {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .chefs-specials .menu-item {
+            background: rgba(255,255,255,0.95);
+            color: #2c3e50;
+        }
+        
+        .chefs-specials .menu-item:hover {
+            background: white;
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
         .menu-header {
             padding: 25px;
             background: linear-gradient(135deg, var(--light-bg), #ffffff);
@@ -266,6 +318,31 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             transition: all 0.3s ease;
             cursor: pointer;
             border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .menu-item.featured {
+            background: linear-gradient(135deg, #fff9e6, #fff3cc);
+            border-color: #FFD700;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+        }
+        
+        .menu-item.featured::before {
+            content: "\2605";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .menu-item:hover {
@@ -362,6 +439,32 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             font-size: 1.2em;
             margin-left: 15px;
             white-space: nowrap;
+        }
+        
+        .admin-edit-link {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .menu-item:hover .admin-edit-link {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .admin-edit-link:hover {
+            background: rgba(76, 175, 80, 1);
+            transform: scale(1.05);
         }
         
         .featured-items {
@@ -678,19 +781,23 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
         </div>
         
         <div class="menu-filters">
-            <a href="?" class="filter-button all <?= $filterMenu === 'all' ? 'active' : '' ?>">
-                📋 All Menus
-            </a>
+            <button class="filter-button all active" data-menu="all">📋 All Menus</button>
             <?php foreach ($menuNames as $menu): ?>
                 <?php 
                 $menuFilter = ($menu['id'] === 'chefs_specials') ? 'chefs_specials' : strtolower($menu['name']);
-                $isActive = $filterMenu === $menuFilter;
                 ?>
-                <a href="?menu=<?= $menuFilter ?>" 
-                   class="filter-button <?= $menuFilter ?> <?= $isActive ? 'active' : '' ?>">
+                <button class="filter-button <?= $menuFilter ?>" data-menu="<?= $menuFilter ?>">
                     <?= getMenuIcon($menu['name']) ?> <?= htmlspecialchars($menu['name']) ?>
-                </a>
+                </button>
             <?php endforeach; ?>
+        </div>
+
+        <div class="menu-filters dietary-filters">
+            <button class="filter-button dietary active" data-dietary="all">All Items</button>
+            <button class="filter-button dietary" data-dietary="gluten_free">🌾 Gluten-Free</button>
+            <button class="filter-button dietary" data-dietary="vegan">🌱 Vegan</button>
+            <button class="filter-button dietary" data-dietary="spicy">🌶️ Spicy</button>
+            <button class="filter-button dietary" data-dietary="popular">🔥 Popular</button>
         </div>
         
         <div class="menu-container">
@@ -725,6 +832,15 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
                                     <div class="menu-items">
                                         <?php foreach ($section['items'] as $item): ?>
                                             <div class="menu-item" onclick="openItemLightbox(<?= $item['id'] ?>)">
+                                                <?php if ($isUserAdmin): ?>
+                                                    <a href="admin/items.php?edit=<?= $item['id'] ?>" 
+                                                       class="admin-edit-link" 
+                                                       target="_blank" 
+                                                       onclick="event.stopPropagation();"
+                                                       title="Edit this item">
+                                                        ✏️ Edit
+                                                    </a>
+                                                <?php endif; ?>
                                                 <div class="item-info">
                                                     <div class="item-name"><?= htmlspecialchars($item['name']) ?></div>
                                                     <?php if ($item['description']): ?>
@@ -788,6 +904,13 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             <div class="website-url">Plate Sushi St. Pete</div>
             <p>Experience authentic flavors with our carefully crafted sushi and fusion cuisine selections.</p>
             <p>Fresh ingredients • Traditional techniques • Modern presentation</p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 0.9em; color: #888;">
+                <p>&copy; 2025 Computer Networking Resources (CNR), Savannah, Georgia. All rights reserved.</p>
+                <p>Website developed by CNR • <a href="https://cnrit.com" target="_blank" style="color: #4CAF50; text-decoration: none;">cnrit.com</a></p>
+                <?php if ($isUserAdmin): ?>
+                    <p><a href="admin/" style="color: #4CAF50; text-decoration: none;">Admin Section</a></p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
     
@@ -802,9 +925,172 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
     </div>
     
     <script>
+        let currentMenuFilter = 'all';
+        let currentDietaryFilter = 'all';
         let currentImages = [];
         let currentImageIndex = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to menu filter buttons
+            document.querySelectorAll('.menu-filters .filter-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    currentMenuFilter = this.dataset.menu;
+                    document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    fetchMenuData();
+                });
+            });
+
+            // Add event listeners to dietary filter buttons
+            document.querySelectorAll('.dietary-filters .filter-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    currentDietaryFilter = this.dataset.dietary;
+                    document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    if(currentDietaryFilter === 'all') {
+                        // Clear URL parameters for "All Items"
+                        history.pushState({}, '', window.location.pathname);
+                        currentMenuFilter = 'all';
+                        document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                        document.querySelector('.menu-filters .filter-button.all').classList.add('active');
+                        fetchMenuData();
+                    } else {
+                        // Set menu to "all" for dietary filters to show items across all menus
+                        currentMenuFilter = 'all';
+                        document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                        document.querySelector('.menu-filters .filter-button.all').classList.add('active');
+                        fetchMenuData();
+                    }
+                });
+            });
+        });
+
+        function fetchMenuData() {
+            const menuContainer = document.querySelector('.menu-container');
+            const featuredContainer = document.querySelector('.featured-items');
+            const url = `api/get_menu_data.php?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`;
+
+            // Show loading spinner
+            menuContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div>`;
+            if(featuredContainer) featuredContainer.style.display = 'none';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updatePageContent(data);
+                        // Only update URL if not "All Items" (which clears parameters)
+                        if (currentDietaryFilter !== 'all') {
+                            history.pushState({menu: currentMenuFilter, dietary: currentDietaryFilter}, '', `?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`);
+                        }
+                    } else {
+                        menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Error</h2><p>${data.error}</p></div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching menu data:', error);
+                    menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Error</h2><p>Could not connect to the server.</p></div>`;
+                });
+        }
+
+        function updatePageContent(data) {
+            const menuContainer = document.querySelector('.menu-container');
+            const featuredContainer = document.querySelector('.featured-items');
+            
+            // Render menus
+            menuContainer.innerHTML = renderMenus(data.menus);
+            
+            // Render featured items
+            if (featuredContainer) {
+                if (data.featured_items && data.featured_items.length > 0) {
+                    featuredContainer.style.display = 'block';
+                    featuredContainer.querySelector('.featured-grid').innerHTML = renderFeaturedItems(data.featured_items);
+                } else {
+                    featuredContainer.style.display = 'none';
+                }
+            }
+        }
+
+        function renderMenus(menus) {
+            if (!menus || menus.length === 0) {
+                return `<div style="text-align: center; padding: 40px; color: #666;"><h2>No Items Found</h2><p>No menu items match the selected filters.</p></div>`;
+            }
+            return menus.map(menu => `
+                <div class="menu-section">
+                    <div class="menu-header">
+                        <h2 class="menu-title">
+                            ${getMenuIcon(menu.name)} ${escapeHtml(menu.name)} Menu
+                        </h2>
+                        ${menu.description ? `<p class="menu-description">${escapeHtml(menu.description)}</p>` : ''}
+                    </div>
+                    <div class="sections-container">
+                        ${menu.sections.map(section => renderSection(section)).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSection(section) {
+            return `
+                <div class="section">
+                    <div class="section-header">
+                        <h3 class="section-title">${escapeHtml(section.name)}</h3>
+                        ${section.description ? `<p class="section-description">${escapeHtml(section.description)}</p>` : ''}
+                    </div>
+                    <div class="menu-items">
+                        ${section.items.map(item => renderMenuItem(item)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMenuItem(item) {
+            // Check if user is admin (this will be set by PHP)
+            const isAdmin = <?= $isUserAdmin ? 'true' : 'false' ?>;
+            
+            return `
+                <div class="menu-item" onclick="openItemLightbox(${item.id})">
+                    ${isAdmin ? `
+                        <a href="admin/items.php?edit=${item.id}" 
+                           class="admin-edit-link" 
+                           target="_blank" 
+                           onclick="event.stopPropagation();"
+                           title="Edit this item">
+                            ✏️ Edit
+                        </a>
+                    ` : ''}
+                    <div class="item-info">
+                        <div class="item-name">${escapeHtml(item.name)}</div>
+                        ${item.description ? `<div class="item-description">${escapeHtml(item.description)}</div>` : ''}
+                        ${item.dietary_info ? `<div class="item-dietary">${escapeHtml(item.dietary_info)}</div>` : ''}
+                        ${item.icons && item.icons.length > 0 ? `
+                            <div class="item-icons">
+                                ${item.icons.map(icon => `
+                                    <div class="dietary-icon icon-${escapeHtml(icon.icon_name)}" title="${escapeHtml(icon.tooltip_text || icon.icon_name.replace(/_/g, ' '))}">
+                                        ${getDietaryIconSymbol(icon.icon_name)}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${item.price ? `<div class="item-price">$${parseFloat(item.price).toFixed(2)}</div>` : ''}
+                </div>
+            `;
+        }
         
+        function renderFeaturedItems(items) {
+            return items.map(item => `
+                <div class="featured-item" onclick="openItemLightbox(${item.item_id})">
+                    <img src="${escapeHtml(item.primary_image || 'images/default-featured.png')}" alt="${escapeHtml(item.item_name)}">
+                    <div class="featured-item-info">
+                        <div class="featured-item-name">${escapeHtml(item.item_name)}</div>
+                        ${item.price ? `<div class="featured-item-price">$${parseFloat(item.price).toFixed(2)}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function openItemLightbox(itemId) {
             // Show loading state
             document.getElementById('lightboxContent').innerHTML = `
@@ -987,6 +1273,31 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             div.textContent = text;
             return div.innerHTML;
         }
+
+        function getMenuIcon(menuName) {
+            const name = menuName.toLowerCase();
+            switch (name) {
+                case 'special': return '⭐';
+                case 'chef\'s specials': return '👨‍🍳';
+                case 'chefs specials': return '👨‍🍳';
+                case 'food': return '🍣';
+                case 'drinks': return '🍺';
+                case 'wine': return '🍷';
+                default: return '📋';
+            }
+        }
+
+        function getDietaryIconSymbol(iconName) {
+            switch (iconName) {
+                case 'gluten_free': return '🌾';
+                case 'vegan': return '🌱';
+                case 'has_image': return '📷';
+                case 'spicy': return '🌶️';
+                case 'new': return '✨';
+                case 'popular': return '🔥';
+                default: return '❓';
+            }
+        }
         
         // Close lightbox when clicking outside content
         window.onclick = function(event) {
@@ -1012,19 +1323,6 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             }
         });
         
-        // Smooth scrolling for filter buttons
-        document.querySelectorAll('.filter-button').forEach(button => {
-            button.addEventListener('click', function(e) {
-                // Add loading animation
-                const originalText = this.innerHTML;
-                this.innerHTML = '<span style="animation: spin 1s linear infinite;">⟳</span> Loading...';
-                
-                // Reset after a short delay if navigation doesn't happen
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                }, 3000);
-            });
-        });
     </script>
 </body>
 </html>
@@ -1034,6 +1332,7 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
  * Helper function to get appropriate icon for menu types
  */
 function getMenuIcon($menuName) {
+    $menuName = strtolower($menuName);
     switch (strtolower($menuName)) {
         case 'special': return '⭐';
         case 'chef\'s specials': return '👨‍🍳';

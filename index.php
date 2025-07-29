@@ -413,30 +413,190 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.9);
+            animation: fadeIn 0.3s ease;
         }
         
         .lightbox-content {
             position: relative;
-            margin: 5% auto;
-            padding: 20px;
-            width: 90%;
-            max-width: 600px;
+            margin: 2% auto;
+            padding: 0;
+            width: 95%;
+            max-width: 800px;
             background: white;
             border-radius: var(--border-radius);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .lightbox-header {
+            padding: 25px;
+            border-bottom: 2px solid var(--light-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .lightbox-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
         }
         
         .close {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 30px;
+            font-size: 35px;
             cursor: pointer;
             color: #999;
+            transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--light-bg);
         }
         
         .close:hover {
             color: #333;
+            background: #e0e0e0;
+            transform: scale(1.1);
+        }
+        
+        .lightbox-body {
+            padding: 25px;
+        }
+        
+        .item-gallery {
+            margin-bottom: 25px;
+        }
+        
+        .main-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+        }
+        
+        .image-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .thumbnail:hover,
+        .thumbnail.active {
+            opacity: 1;
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        .item-details {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .detail-content {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .item-meta {
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+        }
+        
+        .price-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .lightbox-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .lightbox-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: help;
+            transition: all 0.3s ease;
+        }
+        
+        .lightbox-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -606,28 +766,215 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
     </div>
     
     <script>
+        let currentImages = [];
+        let currentImageIndex = 0;
+        
         function openItemLightbox(itemId) {
-            // For now, show a simple message
-            // Later we'll implement AJAX to load item details and images
+            // Show loading state
             document.getElementById('lightboxContent').innerHTML = `
-                <h3>Menu Item Details</h3>
-                <p>Item ID: ${itemId}</p>
-                <p>Photo gallery and detailed information will be loaded here.</p>
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading menu item details...</p>
+                </div>
             `;
             document.getElementById('itemLightbox').style.display = 'block';
+            
+            // Fetch item details via AJAX
+            fetch(`get_item_details.php?id=${itemId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayItemDetails(data);
+                    } else {
+                        showError(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Failed to load item details');
+                });
+        }
+        
+        function displayItemDetails(data) {
+            const item = data.item;
+            const images = data.images;
+            const icons = data.icons;
+            
+            currentImages = images;
+            currentImageIndex = 0;
+            
+            let html = `
+                <div class="lightbox-header">
+                    <h2 class="lightbox-title">${escapeHtml(item.name)}</h2>
+                    <span class="close" onclick="closeLightbox()">&times;</span>
+                </div>
+                <div class="lightbox-body">
+            `;
+            
+            // Image gallery
+            if (images && images.length > 0) {
+                html += `
+                    <div class="item-gallery">
+                        <img id="mainImage" src="${escapeHtml(images[0].path)}" 
+                             alt="${escapeHtml(images[0].alt)}" class="main-image">
+                `;
+                
+                if (images.length > 1) {
+                    html += '<div class="image-thumbnails">';
+                    images.forEach((img, index) => {
+                        html += `
+                            <img src="${escapeHtml(img.path)}" 
+                                 alt="${escapeHtml(img.alt)}" 
+                                 class="thumbnail ${index === 0 ? 'active' : ''}" 
+                                 onclick="changeImage(${index})">
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            }
+            
+            // Item details
+            html += '<div class="item-details">';
+            
+            // Left column - details
+            html += '<div>';
+            
+            if (item.description) {
+                html += `
+                    <div class="detail-section">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-content">${escapeHtml(item.description)}</div>
+                    </div>
+                `;
+            }
+            
+            if (item.ingredients) {
+                html += `
+                    <div class="detail-section">
+                        <div class="detail-label">Ingredients</div>
+                        <div class="detail-content">${escapeHtml(item.ingredients)}</div>
+                    </div>
+                `;
+            }
+            
+            if (item.allergen_info) {
+                html += `
+                    <div class="detail-section">
+                        <div class="detail-label">Allergen Information</div>
+                        <div class="detail-content">${escapeHtml(item.allergen_info)}</div>
+                    </div>
+                `;
+            }
+            
+            if (item.dietary_info) {
+                html += `
+                    <div class="detail-section">
+                        <div class="detail-label">Dietary Information</div>
+                        <div class="detail-content">${escapeHtml(item.dietary_info)}</div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            
+            // Right column - meta
+            html += '<div class="item-meta">';
+            
+            if (item.price) {
+                html += `<div class="price-display">$${parseFloat(item.price).toFixed(2)}</div>`;
+            }
+            
+            if (icons && icons.length > 0) {
+                html += '<div class="lightbox-icons">';
+                icons.forEach(icon => {
+                    html += `
+                        <div class="lightbox-icon icon-${icon.name}" 
+                             title="${escapeHtml(icon.tooltip || icon.name.replace('_', ' '))}">
+                            ${icon.symbol}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            html += `
+                <div style="text-align: center; color: #666; font-size: 0.9em;">
+                    <p><strong>Menu:</strong> ${escapeHtml(item.menu_name)}</p>
+                    <p><strong>Section:</strong> ${escapeHtml(item.section_name)}</p>
+                </div>
+            `;
+            
+            html += '</div></div></div>';
+            
+            document.getElementById('lightboxContent').innerHTML = html;
+        }
+        
+        function changeImage(index) {
+            if (currentImages && currentImages[index]) {
+                const mainImage = document.getElementById('mainImage');
+                mainImage.src = currentImages[index].path;
+                mainImage.alt = currentImages[index].alt;
+                
+                // Update thumbnail active state
+                document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                    thumb.classList.toggle('active', i === index);
+                });
+                
+                currentImageIndex = index;
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('lightboxContent').innerHTML = `
+                <div class="lightbox-header">
+                    <h2 class="lightbox-title">Error</h2>
+                    <span class="close" onclick="closeLightbox()">&times;</span>
+                </div>
+                <div class="lightbox-body">
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <p>❌ ${escapeHtml(message)}</p>
+                    </div>
+                </div>
+            `;
         }
         
         function closeLightbox() {
             document.getElementById('itemLightbox').style.display = 'none';
+            currentImages = [];
+            currentImageIndex = 0;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         // Close lightbox when clicking outside content
         window.onclick = function(event) {
             const lightbox = document.getElementById('itemLightbox');
             if (event.target === lightbox) {
-                lightbox.style.display = 'none';
+                closeLightbox();
             }
         }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            const lightbox = document.getElementById('itemLightbox');
+            if (lightbox.style.display === 'block') {
+                if (event.key === 'Escape') {
+                    closeLightbox();
+                } else if (event.key === 'ArrowLeft' && currentImages.length > 1) {
+                    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : currentImages.length - 1;
+                    changeImage(newIndex);
+                } else if (event.key === 'ArrowRight' && currentImages.length > 1) {
+                    const newIndex = currentImageIndex < currentImages.length - 1 ? currentImageIndex + 1 : 0;
+                    changeImage(newIndex);
+                }
+            }
+        });
         
         // Smooth scrolling for filter buttons
         document.querySelectorAll('.filter-button').forEach(button => {

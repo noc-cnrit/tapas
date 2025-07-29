@@ -15,12 +15,12 @@ $db_config = [
         'charset' => 'utf8mb4'
     ],
     
-    // SiteGround production settings (update when deploying)
+    // SiteGround production settings
     'production' => [
-        'host' => 'localhost', // SiteGround will provide this
-        'database' => 'YOUR_SITEGROUND_DB_NAME', // Change this when going live
-        'username' => 'YOUR_SITEGROUND_USERNAME', // Change this when going live
-        'password' => 'YOUR_SITEGROUND_PASSWORD', // Change this when going live
+        'host' => '35.212.92.200', // SiteGround server IP
+        'database' => 'dblplzygqhkye4', // Menu system database
+        'username' => 'urhgsgyruysgz',
+        'password' => 'pcyjeilfextq',
         'charset' => 'utf8mb4'
     ]
 ];
@@ -28,8 +28,13 @@ $db_config = [
 // Automatically detect environment (you can also set this manually)
 $isCli = php_sapi_name() === 'cli';
 $httpHost = $isCli ? 'localhost' : ($_SERVER['HTTP_HOST'] ?? 'localhost');
-$environment = (strpos($httpHost, 'localhost') !== false || 
-                strpos($httpHost, '127.0.0.1') !== false) ? 'local' : 'production';
+
+// FORCE PRODUCTION DATABASE - Switch to SiteGround
+$environment = 'production';
+
+// Original auto-detection code (commented out)
+// $environment = (strpos($httpHost, 'localhost') !== false || 
+//                 strpos($httpHost, '127.0.0.1') !== false) ? 'local' : 'production';
 
 // Get current environment config
 $config = $db_config[$environment];

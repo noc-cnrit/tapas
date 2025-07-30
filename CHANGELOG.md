@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.2] - 2025-01-30
+
+### Added
+- **Chef's Specials Enhancement**: Chef's Specials now always appear at the top when "all" menus are requested
+  - Modified `get_menu_data.php` API to include Chef's Specials in "all" filter response
+  - Updated `index.php` to prepend Chef's Specials on initial page load
+  - Added distinct visual styling for Chef's Specials with warm gold/orange theme
+  - "Featured" badge with refined positioning to avoid clipping
+  - Enhanced JavaScript dynamic rendering to maintain Chef's Specials styling
+
+### Security
+- **Removed Import Data Functionality**: Eliminated risky CSV import feature for production safety
+  - Removed "Import Data" card from admin dashboard (`admin/index.php`)
+  - Disabled import script by renaming `admin/import.php` to `admin/import.php.disabled`
+  - Prevents accidental catastrophic data imports in live environment
+  - Admin dashboard now safely focuses on standard menu management operations
+
+### Improved
+- **Chef's Specials Styling**: Refined visual presentation based on user feedback
+  - Toned down from loud red gradient with pulsing animation to subtle warm gold
+  - Moved "Featured" badge positioning from 25px to 15px left for better visibility
+  - Increased z-index to ensure badge properly overlaps container
+  - Consistent styling across both server-rendered and JavaScript-rendered menus
+
 ## [2.0.1] - 2025-01-29
 
 ### Added

@@ -53,11 +53,6 @@
 - Set item availability
 - Upload item photos (if enabled)
 
-### Import Data (`/admin/import.php`)
-- Bulk import menu items via CSV file
-- Download CSV template for proper formatting
-- Useful for migrating from existing menu systems
-
 ### User Management (`/admin/change_password.php`)
 - Change admin password
 - Secure password requirements
@@ -105,7 +100,6 @@
 1. **Can't log in**: Check database connection and credentials
 2. **Items not showing**: Verify item and section are enabled
 3. **Icons not displaying**: Check database icon assignments
-4. **Import fails**: Verify CSV format matches template
 
 ### Database Issues
 - Check `config/database.php` settings

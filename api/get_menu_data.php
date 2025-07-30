@@ -36,6 +36,11 @@ try {
     // Get data based on menu filter
     if ($filterMenu === 'all') {
         $menus = $menuDAO->getAllMenus();
+        // Always include Chef's Specials at the top when showing all menus
+        $chefsSpecials = $menuDAO->getChefsSpecials();
+        if ($chefsSpecials) {
+            array_unshift($menus, $chefsSpecials);
+        }
         $pageTitle = "Complete Menu";
     } elseif ($filterMenu === 'chefs_specials' || $filterMenu === 'chef\'s_specials') {
         $chefsSpecials = $menuDAO->getChefsSpecials();

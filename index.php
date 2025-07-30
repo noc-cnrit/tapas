@@ -36,6 +36,11 @@ $filterMenu = isset($_GET['menu']) ? $_GET['menu'] : 'all';
 // Get data based on filter
 if ($filterMenu === 'all') {
     $menus = $menuDAO->getAllMenus();
+    // Always include Chef's Specials at the top for the initial view
+    $chefsSpecials = $menuDAO->getChefsSpecials();
+    if ($chefsSpecials) {
+        array_unshift($menus, $chefsSpecials);
+    }
     $pageTitle = "Complete Menu";
 } elseif ($filterMenu === 'chefs_specials' || $filterMenu === 'chef\'s_specials') {
     $chefsSpecials = $menuDAO->getChefsSpecials();
@@ -203,8 +208,9 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             background: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            overflow: hidden;
+            overflow: visible;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .menu-section:hover {
@@ -213,41 +219,63 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         }
         
         .chefs-specials {
-            background: linear-gradient(135deg, #2c3e50, #3498db);
+            background: linear-gradient(135deg, #fffaf0, #fff8e7);
+            color: var(--text-color);
+            margin-bottom: 30px;
+            margin-top: 25px;
+            border: 2px solid #f39c12;
+            box-shadow: 0 4px 16px rgba(243, 156, 18, 0.2), var(--shadow);
+            position: relative;
+            overflow: visible;
+        }
+        
+        .chefs-specials::before {
+            content: "⭐ Featured";
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
             color: white;
-            margin-bottom: 40px;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 0.75em;
+            font-weight: bold;
+            box-shadow: 0 3px 12px rgba(243, 156, 18, 0.4);
+            z-index: 10;
         }
         
         .chefs-specials .menu-header {
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border-bottom: 3px solid #e74c3c;
+            background: linear-gradient(135deg, #fff8e7, #ffefd5);
+            border-bottom: 2px solid #f39c12;
+            padding-top: 35px;
         }
         
         .chefs-specials .menu-title {
-            color: white;
+            color: #d68910;
         }
         
         .chefs-specials .menu-description {
-            color: rgba(255,255,255,0.9);
+            color: #7f8c8d;
         }
         
         .chefs-specials .section-title {
-            color: #ecf0f1;
+            color: #f39c12;
         }
         
         .chefs-specials .section-description {
-            color: rgba(255,255,255,0.8);
+            color: #95a5a6;
         }
         
         .chefs-specials .menu-item {
-            background: rgba(255,255,255,0.95);
-            color: #2c3e50;
+            background: rgba(255,255,255,0.9);
+            border-left: 3px solid #f39c12;
         }
         
         .chefs-specials .menu-item:hover {
             background: white;
-            transform: translateX(8px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.25);
+            border-left-color: #e67e22;
         }
         
         .menu-header {
@@ -361,6 +389,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             color: var(--text-color);
             margin-bottom: 5px;
             font-size: 1.1em;
+            text-transform: uppercase;
         }
         
         .item-description {
@@ -738,6 +767,17 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             100% { transform: rotate(360deg); }
         }
         
+        @keyframes chefSpecialsPulse {
+            0%, 100% { 
+                box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3), var(--hover-shadow);
+                border-color: #FFD700;
+            }
+            50% { 
+                box-shadow: 0 12px 40px rgba(255, 215, 0, 0.6), 0 16px 32px rgba(220, 20, 60, 0.4);
+                border-color: #FFA500;
+            }
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -808,7 +848,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                 </div>
             <?php else: ?>
                 <?php foreach ($menus as $menu): ?>
-                    <div class="menu-section">
+                    <div class="menu-section<?= ($menu['name'] === "Chef's Specials") ? ' chefs-specials' : '' ?>">
                         <div class="menu-header">
                             <h2 class="menu-title">
                                 <?= getMenuIcon($menu['name']) ?>
@@ -902,7 +942,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         
         <div class="restaurant-info">
             <div class="website-url">Plate Sushi St. Pete</div>
-            <p>Experience authentic flavors with our carefully crafted sushi and fusion cuisine selections.</p>
+            <p>Experience authentic flavors with our carefully crafted sushi and fusion tapas selections.</p>
             <p>Fresh ingredients • Traditional techniques • Modern presentation</p>
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 0.9em; color: #888;">
                 <p>&copy; 2025 Computer Networking Resources (CNR), Savannah, Georgia. All rights reserved.</p>
@@ -937,6 +977,15 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                     currentMenuFilter = this.dataset.menu;
                     document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
+                    
+                    // Clear URL parameters for "All Menus"
+                    if (currentMenuFilter === 'all') {
+                        history.pushState({}, '', window.location.pathname);
+                        currentDietaryFilter = 'all';
+                        document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                        document.querySelector('.dietary-filters .filter-button.dietary').classList.add('active');
+                    }
+                    
                     fetchMenuData();
                 });
             });
@@ -1017,7 +1066,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                 return `<div style="text-align: center; padding: 40px; color: #666;"><h2>No Items Found</h2><p>No menu items match the selected filters.</p></div>`;
             }
             return menus.map(menu => `
-                <div class="menu-section">
+                <div class="menu-section${menu.name === "Chef's Specials" ? ' chefs-specials' : ''}">
                     <div class="menu-header">
                         <h2 class="menu-title">
                             ${getMenuIcon(menu.name)} ${escapeHtml(menu.name)} Menu

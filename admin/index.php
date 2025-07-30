@@ -316,17 +316,6 @@ try {
             </div>
             
             <div class="admin-card">
-                <div class="card-header import">
-                    <div class="card-icon">📥</div>
-                    <div class="card-title">Import Data</div>
-                    <div class="card-description">Import menu items from CSV files and manage data imports</div>
-                </div>
-                <div class="card-body">
-                    <a href="import.php" class="card-link">Import CSV</a>
-                </div>
-            </div>
-            
-            <div class="admin-card">
                 <div class="card-header menu">
                     <div class="card-icon">🌐</div>
                     <div class="card-title">View Menu</div>

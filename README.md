@@ -30,8 +30,8 @@ A comprehensive restaurant menu management system with admin panel, dietary icon
   - `menus.php` - Menu management
   - `sections.php` - Menu section management with add new section functionality
   - `items.php` - Menu item management
-  - `import.php` - CSV import functionality
   - `change_password.php` - Password management
+  - `import.php.disabled` - Disabled CSV import functionality (for security)
 
 ### Backend Classes
 - `classes/Auth.php` - Authentication system
@@ -110,6 +110,7 @@ pip install qrcode[pil]
 - **📷 QR code generation** - Multiple ways to create QR codes
 - **🎨 Clean design** - Professional appearance suitable for restaurants
 - **🖨️ Print-friendly** - QR codes page optimized for printing
+- **⭐ Chef's Specials** - Prominently featured specials with distinct gold styling and "Featured" badge
 
 ### Admin Panel Features
 - **🔐 Secure Authentication** - Login system for administrators
@@ -121,8 +122,8 @@ pip install qrcode[pil]
   - Open in new tab without losing browsing context
   - Only visible to authenticated admin users
 - **🏷️ Dietary Icons** - Assign dietary restriction icons to menu items
-- **📊 Import/Export** - CSV import functionality for bulk menu updates
 - **👤 User Management** - Password change functionality
+- **⭐ Chef's Specials Management** - Create and manage featured specials that appear prominently
 - **💾 Database-Driven** - All content stored in MySQL database
 
 ## 📱 Testing the QR Codes
@@ -179,10 +180,45 @@ Run the database setup script to create the initial admin user and sample data.
 
 ## Installation
 
+### Production Installation
 1. Upload all files to your web server
 2. Configure database connection in `config/database.php`
 3. Run `database/setup.php` to initialize the database
 4. Access the admin panel at `/admin/`
+
+### Local Development Setup (WAMP)
+
+#### Prerequisites
+- **WAMP Server** installed at `Y:\wamp64`
+- **PHP Path**: `Y:\wamp64\bin\php\php8.3.14\php.exe`
+- MySQL/MariaDB running via WAMP
+
+#### WordPress Local Setup
+1. **Create Local Database**:
+   - Open phpMyAdmin (http://localhost/phpmyadmin/)
+   - Run the SQL script: `wp/setup-local-db.sql`
+   - This creates a `tapas_wp` database
+
+2. **Configure WordPress**:
+   ```bash
+   # Copy local config to active config
+   copy wp/wp-config-local.php wp/wp-config.php
+   ```
+
+3. **Install WordPress**:
+   - Visit: http://localhost/tapas/wp/
+   - Follow WordPress installation wizard
+   - Create admin user for image management
+
+4. **Configure Main Application**:
+   - Update `config/database.php` for local MySQL
+   - Run `database/setup.php` for menu system
+
+#### Local Development URLs
+- **Main Menu App**: http://localhost/tapas/
+- **WordPress Media**: http://localhost/tapas/wp/
+- **Admin Panel**: http://localhost/tapas/admin/
+- **phpMyAdmin**: http://localhost/phpmyadmin/
 
 ## Support
 

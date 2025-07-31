@@ -3,6 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plate St. Pete - Modern Tapas & Sushi</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="images/logo.png" alt="Plate St. Pete - Sushi & Tapas" class="logo-image">
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#menu" class="menu-link">Menu</a></li>
+                <li><a href="#social">Social</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Authentic <span class="accent">Sushi</span> &<br>
+                    <span class="title-line-two">Fusion <span class="accent">Tapas</span> Experience</span>
+                </h1>
+                <p class="hero-subtitle">Discover the perfect blend of traditional sushi artistry and innovative fusion tapas in the heart of St. Petersburg</p>
+                <div class="hero-buttons">
+                    <a href="#menu" class="btn btn-primary">View Menu</a>
+                    <a href="#about" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="image-placeholder">
+                    <div class="food-image food-image-1">
+                        <img src="images/duck-empanada.jpg" alt="Duck Empanada" loading="lazy">
+                    </div>
+                    <div class="food-image food-image-2">
+                        <img src="images/grilled-octopus.jpg" alt="Grilled Octopus" loading="lazy">
+                    </div>
+                    <div class="food-image food-image-3">
+                        <img src="images/chicken-satay.jpg" alt="Chicken Satay" loading="lazy">
+                    </div>
+                    <div class="food-image food-image-4">
+                        <img src="images/lamb-lollipop.jpg" alt="Lamb Lollipop" loading="lazy">
+                    </div>
+                    <div class="food-image food-image-5">
+                        <img src="images/crab-bites.jpg" alt="Crab Bites" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Media Section -->
+    <section id="social" class="social-media">
+        <div class="container">
+            <h2 class="section-title">Follow Our <span class="accent">Journey</span></h2>
+            <p class="section-subtitle">Stay connected with us on social media for the latest dishes, events, and behind-the-scenes moments</p>
+            
+            <div class="social-grid">
+                <div class="social-card facebook-card">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </div>
+                    <h3>Facebook</h3>
+                    <p>Like our page for daily specials, event announcements, and mouth-watering food photos!</p>
+                    <a href="#" class="social-btn facebook-btn" target="_blank">Follow on Facebook</a>
+                </div>
+                
+                <div class="social-card instagram-card">
+                    <div class="social-icon">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </div>
+                    <h3>Instagram</h3>
+                    <p>Follow us for stunning food photography, chef's creations, and the latest from our kitchen!</p>
+                    <a href="#" class="social-btn instagram-btn" target="_blank">Follow on Instagram</a>
+                </div>
+            </div>
+            
+            <div class="social-cta">
+                <p>Tag us in your photos <span class="hashtag">#PlateStPete</span> for a chance to be featured!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <h2 class="section-title">Crafted with <span class="accent">Passion</span></h2>
+                    <p>At Plate St. Pete, we blend modern culinary techniques with classic design aesthetics. Our menu features innovative tapas and expertly crafted sushi, all served in an atmosphere that celebrates both contemporary flavors and timeless style.</p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🍣</div>
+                            <h3>Fresh Sushi</h3>
+                            <p>Daily selection of premium fish and creative rolls</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🍽️</div>
+                            <h3>Modern Tapas</h3>
+                            <p>Small plates with bold flavors and artistic presentation</p>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🍸</div>
+                            <h3>Craft Cocktails</h3>
+                            <p>Signature drinks inspired by timeless classics</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="image-frame">
+                        <img src="images/restaurant-interior.jpg" alt="Restaurant Interior" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <h2 class="section-title">Our <span class="accent">Menu</span></h2>
+            <p class="section-subtitle">Discover our carefully curated selection of tapas, sushi, and craft beverages</p>
+            
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="menu-card-image">
+                        <div class="placeholder-food">Tapas</div>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3>Small Plates & Tapas</h3>
+                        <p>Innovative small plates perfect for sharing, featuring global flavors with a modern twist.</p>
+                        <a href="menu.php" class="menu-btn" target="_blank">View Tapas Menu</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-image">
+                        <div class="placeholder-food">Sushi</div>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3>Fresh Sushi & Rolls</h3>
+                        <p>Premium sushi and specialty rolls crafted with the finest ingredients and artistic presentation.</p>
+                        <a href="menu.php" class="menu-btn" target="_blank">View Sushi Menu</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-image">
+                        <div class="placeholder-food">Drinks</div>
+                    </div>
+                    <div class="menu-card-content">
+                        <h3>Craft Beverages</h3>
+                        <p>Signature cocktails, premium sake, and carefully selected wines to complement your dining experience.</p>
+                        <a href="menu.php" class="menu-btn" target="_blank">View Drinks Menu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2 class="section-title">Visit <span class="accent">Us</span></h2>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <h3>Location</h3>
+                            <p>Downtown St. Petersburg<br>Florida</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>Hours</h3>
+                            <p>Tuesday - Sunday<br>5:00 PM - 10:00 PM</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>Reservations</h3>
+                            <p>Call us for reservations<br>Walk-ins welcome</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-image">
+                    <div class="map-placeholder">
+                        <img src="images/st-pete-skyline.jpg" alt="St. Petersburg Skyline" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>PLATE</h3>
+                    <p>Modern dining in St. Petersburg</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#menu">Menu</a>
+                    <a href="#social">Social</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Plate St. Pete. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sushi Tapas Menu</title>
     <style>
         body {

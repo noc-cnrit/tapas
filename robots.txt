@@ -1,0 +1,32 @@
+User-agent: *
+Allow: /
+
+# Block admin and sensitive directories
+Disallow: /admin/
+Disallow: /database/
+Disallow: /classes/
+Disallow: /wp/wp-admin/
+Disallow: /wp/wp-includes/
+Disallow: /wp/wp-content/plugins/
+Disallow: /wp/wp-content/themes/
+Disallow: /wp/wp-content/uploads/
+
+# Block temporary and test files
+Disallow: /temp*.html
+Disallow: /test*.php
+Disallow: /check_schema.php
+Disallow: /wp-config-integration.php
+Disallow: /wp-image-picker-example.php
+
+# Block specific file types
+Disallow: /*.sql$
+Disallow: /*.log$
+Disallow: /*.txt$
+Disallow: /*.bak$
+
+# Allow robots.txt and sitemap to be crawled
+Allow: /robots.txt
+Allow: /sitemap*.xml
+
+# Sitemap location
+Sitemap: https://platestpete.com/sitemap.xml

@@ -21,16 +21,38 @@ if ($_POST) {
         if (isset($_POST['action'])) {
             switch ($_POST['action']) {
                 case 'add_section':
+                    // Handle photo upload
+                    $photoPath = null;
+                    if (isset($_FILES['new_section_photo']) && $_FILES['new_section_photo']['error'] === UPLOAD_ERR_OK) {
+                        $uploadDir = '../images/sections/';
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0755, true);
+                        }
+                        
+                        $fileExtension = strtolower(pathinfo($_FILES['new_section_photo']['name'], PATHINFO_EXTENSION));
+                        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        
+                        if (in_array($fileExtension, $allowedExtensions)) {
+                            $fileName = 'section_' . time() . '_' . uniqid() . '.' . $fileExtension;
+                            $targetPath = $uploadDir . $fileName;
+                            
+                            if (move_uploaded_file($_FILES['new_section_photo']['tmp_name'], $targetPath)) {
+                                $photoPath = 'images/sections/' . $fileName;
+                            }
+                        }
+                    }
+                    
                     // Get the next display order for the selected menu
                     $orderStmt = $pdo->prepare("SELECT COALESCE(MAX(display_order), 0) + 1 as next_order FROM menu_sections WHERE menu_id = ?");
                     $orderStmt->execute([$_POST['new_menu_id']]);
                     $nextOrder = $orderStmt->fetchColumn();
                     
-                    $stmt = $pdo->prepare("INSERT INTO menu_sections (menu_id, name, description, display_order, is_active, is_disabled) VALUES (?, ?, ?, ?, 1, 0)");
+                    $stmt = $pdo->prepare("INSERT INTO menu_sections (menu_id, name, description, photo, display_order, is_active, is_disabled) VALUES (?, ?, ?, ?, ?, 1, 0)");
                     $stmt->execute([
                         $_POST['new_menu_id'], 
                         $_POST['new_section_name'], 
                         $_POST['new_section_description'] ?: null,
+                        $photoPath,
                         $nextOrder
                     ]);
                     $message = "New section '" . htmlspecialchars($_POST['new_section_name']) . "' added successfully!";
@@ -49,6 +71,81 @@ if ($_POST) {
                     $stmt = $pdo->prepare("UPDATE menu_sections SET menu_id = ? WHERE id = ?");
                     $stmt->execute([$_POST['menu_id'], $_POST['section_id']]);
                     $message = "Section menu updated successfully!";
+                    break;
+                case 'update_photo':
+                    // Handle photo upload/update or path selection
+                    $photoPath = null;
+                    
+                    // Check if a photo path was provided (from browse selection)
+                    if (isset($_POST['section_photo_path']) && !empty($_POST['section_photo_path'])) {
+                        $photoPath = $_POST['section_photo_path'];
+                        
+                        // Remove old photo if it exists and it's not a WordPress upload
+                        $oldPhotoStmt = $pdo->prepare("SELECT photo FROM menu_sections WHERE id = ?");
+                        $oldPhotoStmt->execute([$_POST['section_id']]);
+                        $oldPhoto = $oldPhotoStmt->fetchColumn();
+                        
+                        if ($oldPhoto && strpos($oldPhoto, 'images/sections/') === 0 && file_exists('../' . $oldPhoto)) {
+                            unlink('../' . $oldPhoto);
+                        }
+                        
+                        // Update with selected photo
+                        $stmt = $pdo->prepare("UPDATE menu_sections SET photo = ? WHERE id = ?");
+                        $stmt->execute([$photoPath, $_POST['section_id']]);
+                        $message = "Section photo updated successfully!";
+                        
+                    } elseif (isset($_FILES['section_photo']) && $_FILES['section_photo']['error'] === UPLOAD_ERR_OK) {
+                        $uploadDir = '../images/sections/';
+                        if (!is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0755, true);
+                        }
+                        
+                        $fileExtension = strtolower(pathinfo($_FILES['section_photo']['name'], PATHINFO_EXTENSION));
+                        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                        
+                        if (in_array($fileExtension, $allowedExtensions)) {
+                            $fileName = 'section_' . time() . '_' . uniqid() . '.' . $fileExtension;
+                            $targetPath = $uploadDir . $fileName;
+                            
+                            if (move_uploaded_file($_FILES['section_photo']['tmp_name'], $targetPath)) {
+                                $photoPath = 'images/sections/' . $fileName;
+                                
+                                // Remove old photo if it exists
+                                $oldPhotoStmt = $pdo->prepare("SELECT photo FROM menu_sections WHERE id = ?");
+                                $oldPhotoStmt->execute([$_POST['section_id']]);
+                                $oldPhoto = $oldPhotoStmt->fetchColumn();
+                                
+                                if ($oldPhoto && file_exists('../' . $oldPhoto)) {
+                                    unlink('../' . $oldPhoto);
+                                }
+                                
+                                // Update with new photo
+                                $stmt = $pdo->prepare("UPDATE menu_sections SET photo = ? WHERE id = ?");
+                                $stmt->execute([$photoPath, $_POST['section_id']]);
+                                $message = "Section photo updated successfully!";
+                            } else {
+                                $error = "Failed to upload photo.";
+                            }
+                        } else {
+                            $error = "Invalid file type. Please upload JPG, PNG, GIF, or WebP images only.";
+                        }
+                    } else {
+                        $error = "No photo uploaded or upload error occurred.";
+                    }
+                    break;
+                case 'remove_photo':
+                    // Remove photo from section
+                    $photoStmt = $pdo->prepare("SELECT photo FROM menu_sections WHERE id = ?");
+                    $photoStmt->execute([$_POST['section_id']]);
+                    $currentPhoto = $photoStmt->fetchColumn();
+                    
+                    if ($currentPhoto && file_exists('../' . $currentPhoto)) {
+                        unlink('../' . $currentPhoto);
+                    }
+                    
+                    $stmt = $pdo->prepare("UPDATE menu_sections SET photo = NULL WHERE id = ?");
+                    $stmt->execute([$_POST['section_id']]);
+                    $message = "Section photo removed successfully!";
                     break;
             }
         } elseif (isset($_POST['section_id']) && isset($_POST['is_disabled'])) {
@@ -71,6 +168,7 @@ try {
             s.menu_id,
             s.name as section_name,
             s.description,
+            s.photo,
             s.is_active,
             s.is_disabled,
             s.display_order,
@@ -79,7 +177,7 @@ try {
         FROM menu_sections s
         JOIN menus m ON s.menu_id = m.id
         LEFT JOIN menu_items i ON s.id = i.section_id AND i.is_available = 1
-        GROUP BY s.id, s.menu_id, s.name, s.description, s.is_active, s.is_disabled, s.display_order, m.name
+        GROUP BY s.id, s.menu_id, s.name, s.description, s.photo, s.is_active, s.is_disabled, s.display_order, m.name
         ORDER BY m.display_order, s.display_order
     ";
     $stmt = $pdo->query($sql);
@@ -144,6 +242,12 @@ try {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+        }
+        .photo-grid p {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #666;
+            font-style: italic;
         }
         th, td {
             padding: 12px;
@@ -284,6 +388,150 @@ try {
             outline: none;
             border-color: #0056b3;
         }
+        
+        /* Photo management styles */
+        .photo-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .photo-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .photo-actions {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
+        }
+        .photo-btn {
+            padding: 3px 8px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+        .photo-btn.upload {
+            background-color: #007bff;
+            color: white;
+        }
+        .photo-btn.remove {
+            background-color: #dc3545;
+            color: white;
+        }
+        .photo-btn:hover {
+            opacity: 0.8;
+        }
+        .photo-upload-form {
+            display: none;
+            margin-top: 5px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .photo-upload-form input[type="file"] {
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+        .photo-form-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        /* Modal styles */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+        }
+        .close:hover {
+            color: black;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .thumbnail {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .thumbnail:hover {
+            border-color: #007bff;
+        }
+        
+        /* Search functionality styles */
+        .search-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        .photo-search {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        .photo-search:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .search-info {
+            margin-top: 8px;
+            color: #666;
+            font-size: 13px;
+            text-align: center;
+        }
+        .thumbnail.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -291,10 +539,10 @@ try {
         <h1>🛠️ Section Management</h1>
         
         <div class="nav-links">
-            <a href="index.php">← Admin Dashboard</a>
-            <a href="menus.php">Manage Menus</a>
-            <a href="items.php">Manage Items</a>
-            <a href="login.php?logout=1">Logout</a>
+            <a href="index">← Admin Dashboard</a>
+            <a href="menus">Manage Menus</a>
+            <a href="items">Manage Items</a>
+            <a href="login?logout=1">Logout</a>
         </div>
 
         <?php if (isset($message)): ?>
@@ -315,6 +563,8 @@ try {
                     <th>Menu</th>
                     <th>Section Name</th>
                     <th>Description</th>
+                    <th>Photo</th>
+                    <th>Browse</th>
                     <th>Items</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -346,6 +596,43 @@ try {
                                  data-original-value="<?= htmlspecialchars($section['description'] ?: '') ?>">
                                 <?= htmlspecialchars($section['description'] ?: 'No description') ?>
                             </div>
+                        </td>
+                        <td class="photo-cell">
+                            <?php if ($section['photo']): ?>
+                                <img src="../<?= htmlspecialchars($section['photo']) ?>" 
+                                     alt="Section photo" 
+                                     class="photo-thumbnail"
+                                     onerror="this.style.display='none'">
+                                <div class="photo-actions">
+                                    <button class="photo-btn upload" onclick="togglePhotoForm(<?= $section['id'] ?>)">Change</button>
+                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Remove this photo?')">
+                                        <input type="hidden" name="action" value="remove_photo">
+                                        <input type="hidden" name="section_id" value="<?= $section['id'] ?>">
+                                        <button type="submit" class="photo-btn remove">Remove</button>
+                                    </form>
+                                </div>
+                            <?php else: ?>
+                                <div style="color: #666; font-size: 12px;">No photo</div>
+                                <div class="photo-actions">
+                                    <button class="photo-btn upload" onclick="togglePhotoForm(<?= $section['id'] ?>)">Add Photo</button>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <!-- Photo upload form (hidden by default) -->
+                            <div id="photoForm<?= $section['id'] ?>" class="photo-upload-form">
+                                <form method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="action" value="update_photo">
+                                    <input type="hidden" name="section_id" value="<?= $section['id'] ?>">
+                                    <input type="file" name="section_photo" accept="image/*" required>
+                                    <div class="photo-form-buttons">
+                                        <button type="submit" class="photo-btn upload">Upload</button>
+                                        <button type="button" class="photo-btn" onclick="togglePhotoForm(<?= $section['id'] ?>)" style="background: #6c757d;">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                        <td class="photo-cell">
+                            <button class="photo-btn upload" onclick="browsePhotos(<?= $section['id'] ?>)">Browse</button>
                         </td>
                         <td><?= $section['item_count'] ?> items</td>
                         <td>
@@ -386,7 +673,7 @@ try {
     <!-- Form to add a new section -->
     <div class="container">
         <h2>Add New Section</h2>
-        <form method="POST" id="addSectionForm">
+        <form method="POST" enctype="multipart/form-data" id="addSectionForm">
             <input type="hidden" name="action" value="add_section">
             <label for="newMenuId">Menu:</label>
             <select name="new_menu_id" id="newMenuId" required>
@@ -400,6 +687,10 @@ try {
 
             <label for="newSectionDescription">Description:</label>
             <textarea name="new_section_description" id="newSectionDescription" rows="3"></textarea>
+
+            <label for="newSectionPhoto">Section Photo:</label>
+            <input type="file" name="new_section_photo" id="newSectionPhoto" accept="image/*">
+            <small style="color: #666; display: block; margin-top: 5px;">Upload a photo to display for this section (JPG, PNG, GIF, WebP)</small>
 
             <button type="submit">Add Section</button>
         </form>
@@ -558,6 +849,170 @@ try {
         function cancelEdit(field, originalHTML) {
             field.classList.remove('editing');
             field.innerHTML = originalHTML;
+        }
+
+        function browsePhotos(sectionId) {
+            // Create modal structure first
+            let output = '';
+            output += '<div id="photoModal'+ sectionId +'" class="photo-modal">';
+            output += '<div class="modal-content">';
+            output += '<span class="close" onclick="closeModal('+ sectionId +')">&times;</span>';
+            output += '<h2>Select Photo</h2>';
+            output += '<div class="search-container">';
+            output += '<input type="text" id="photoSearch'+ sectionId +'" class="photo-search" placeholder="Search photos by name..." onkeyup="filterPhotos('+ sectionId +')">';
+            output += '<div class="search-info"><span id="photoCount'+ sectionId +'">0</span> photos found</div>';
+            output += '</div>';
+            output += '<div id="photoGrid'+ sectionId +'" class="photo-grid">';
+            output += '<p>Loading images...</p>';
+            output += '</div>';
+            output += '</div>';
+            output += '</div>';
+
+            document.body.insertAdjacentHTML('beforeend', output);
+            document.getElementById('photoModal'+ sectionId).style.display = 'block';
+
+            // Fetch images from server
+            fetch('browse_images.php')
+                .then(response => response.json())
+                .then(data => {
+                    const photoGrid = document.getElementById('photoGrid'+ sectionId);
+                    
+                    // Debug: Log the API response
+                    console.log('API Response:', data);
+                    if (data.debug) {
+                        console.log('Debug info:', data.debug);
+                    }
+                    
+                    if (!data.success) {
+                        photoGrid.innerHTML = '<p>Error: ' + (data.error || 'Failed to load images') + '</p>';
+                        return;
+                    }
+                    
+                    const images = data.images || [];
+                    if (images.length === 0) {
+                        photoGrid.innerHTML = '<p>No images found in WordPress uploads directory.</p>';
+                        return;
+                    }
+                    
+                    let gridHTML = '';
+                    images.forEach(img => {
+                        const escapedPath = img.path.replace(/'/g, "\\'");
+                        const escapedFilename = img.filename.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+                        gridHTML += '<img src="../' + img.path + '" class="thumbnail" onclick="selectPhoto(' + sectionId + ', \'' + escapedPath + '\')" title="' + escapedFilename + '" data-filename="' + img.filename.toLowerCase() + '">';
+                    });
+                    photoGrid.innerHTML = gridHTML;
+                    
+                    // Update photo count
+                    document.getElementById('photoCount' + sectionId).textContent = images.length;
+                    
+                    // Focus on search input
+                    setTimeout(() => {
+                        const searchInput = document.getElementById('photoSearch' + sectionId);
+                        if (searchInput) searchInput.focus();
+                    }, 100);
+                })
+                .catch(error => {
+                    console.error('Error loading images:', error);
+                    const photoGrid = document.getElementById('photoGrid'+ sectionId);
+                    photoGrid.innerHTML = '<p>Error loading images. Please try again.</p>';
+                });
+        }
+
+        function closeModal(sectionId) {
+            const modal = document.getElementById('photoModal'+ sectionId);
+            if (modal) modal.remove();
+        }
+
+        function selectPhoto(sectionId, imgPath) {
+            closeModal(sectionId);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.style.display = 'none';
+
+            const actionInput = document.createElement('input');
+            actionInput.name = 'action';
+            actionInput.value = 'update_photo';
+            form.appendChild(actionInput);
+
+            const sectionInput = document.createElement('input');
+            sectionInput.name = 'section_id';
+            sectionInput.value = sectionId;
+            form.appendChild(sectionInput);
+
+            const photoInput = document.createElement('input');
+            photoInput.name = 'section_photo_path';
+            photoInput.value = imgPath;
+            form.appendChild(photoInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+        function togglePhotoForm(sectionId) {
+            const form = document.getElementById('photoForm' + sectionId);
+            if (form.style.display === 'none' || form.style.display === '') {
+                // Hide all other photo forms first
+                document.querySelectorAll('.photo-upload-form').forEach(function(f) {
+                    f.style.display = 'none';
+                });
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        function filterPhotos(sectionId) {
+            const searchInput = document.getElementById('photoSearch' + sectionId);
+            const photoGrid = document.getElementById('photoGrid' + sectionId);
+            const photoCount = document.getElementById('photoCount' + sectionId);
+            
+            if (!searchInput || !photoGrid || !photoCount) {
+                return;
+            }
+            
+            const searchTerm = searchInput.value.trim();
+            
+            // Show loading message
+            photoGrid.innerHTML = '<p>Searching...</p>';
+            photoCount.textContent = '0';
+            
+            // Make server-side search request
+            const searchUrl = searchTerm ? `browse_images.php?search=${encodeURIComponent(searchTerm)}` : 'browse_images.php';
+            
+            fetch(searchUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        photoGrid.innerHTML = '<p>Error: ' + (data.error || 'Failed to load images') + '</p>';
+                        return;
+                    }
+                    
+                    const images = data.images || [];
+                    if (images.length === 0) {
+                        photoGrid.innerHTML = '<p>No images found matching your search.</p>';
+                        photoCount.textContent = '0';
+                        return;
+                    }
+                    
+                    // Generate new grid HTML with search results
+                    let gridHTML = '';
+                    images.forEach(img => {
+                        const escapedPath = img.path.replace(/'/g, "\\'");
+                        const escapedFilename = img.filename.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+                        gridHTML += '<img src="../' + img.path + '" class="thumbnail" onclick="selectPhoto(' + sectionId + ', \'' + escapedPath + '\')" title="' + escapedFilename + '" data-filename="' + img.filename.toLowerCase() + '">';
+                    });
+                    photoGrid.innerHTML = gridHTML;
+                    
+                    // Update photo count
+                    photoCount.textContent = images.length;
+                    
+                })
+                .catch(error => {
+                    console.error('Error searching images:', error);
+                    photoGrid.innerHTML = '<p>Error searching images. Please try again.</p>';
+                    photoCount.textContent = '0';
+                });
         }
     </script>
 </body>

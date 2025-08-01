@@ -437,10 +437,10 @@ function getAllMenus($pdo) {
         <h1>📋 Menu Management</h1>
         
         <div class="nav-links">
-            <a href="index.php">← Admin Dashboard</a>
-            <a href="sections.php">Manage Sections</a>
-            <a href="items.php">Manage Items</a>
-            <a href="login.php?logout=1">Logout</a>
+            <a href="index">← Admin Dashboard</a>
+            <a href="sections">Manage Sections</a>
+            <a href="items">Manage Items</a>
+            <a href="login?logout=1">Logout</a>
         </div>
 
         <?php if ($message): ?>

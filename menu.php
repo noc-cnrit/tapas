@@ -33,6 +33,7 @@ $menuDAO = new MenuDAO();
 // Get filter parameter
 $filterMenu = isset($_GET['menu']) ? $_GET['menu'] : 'all';
 
+
 // Get data based on filter
 if ($filterMenu === 'all') {
     $menus = $menuDAO->getAllMenus();
@@ -69,25 +70,63 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
     <title><?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Authentic Japanese sushi and fusion cuisine in St. Petersburg, Florida. Fresh sashimi, creative rolls, and innovative fusion dishes. Dine-in and takeout available.">
-    <meta name="keywords" content="sushi, sashimi, Japanese restaurant, fusion cuisine, St. Petersburg, Florida, fresh fish, rolls, Japanese cuisine">
+    <meta name="description" content="Authentic Japanese sushi and fusion tapas in St. Petersburg, Florida. Chef Sean Thongsiri creates fresh sashimi, creative rolls, and innovative Asian fusion dishes. Order online or dine-in.">
+    <meta name="keywords" content="sushi, sashimi, tapas, Japanese restaurant, Asian fusion, St. Petersburg, Florida, Chef Sean Thongsiri, fresh fish, sushi rolls, yakitori, ramen, poke bowls, sake, Japanese cuisine, St Pete dining">
     <meta name="author" content="Plate Sushi St. Pete">
     <meta name="robots" content="index, follow">
+    <meta name="geo.region" content="US-FL">
+    <meta name="geo.placename" content="St. Petersburg, Florida">
+    <meta name="geo.position" content="27.7676;-82.6403">
+    <meta name="ICBM" content="27.7676, -82.6403">
+    
+    <!-- Schema.org markup for Local Business -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Plate Sushi St. Pete",
+        "description": "Authentic Japanese sushi and fusion tapas restaurant in St. Petersburg, Florida",
+        "cuisine": ["Japanese", "Sushi", "Asian Fusion"],
+        "chef": {
+            "@type": "Person",
+            "name": "Sean Thongsiri",
+            "jobTitle": "Executive Chef"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "St. Petersburg",
+            "addressRegion": "FL",
+            "addressCountry": "US"
+        },
+        "url": "<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?>",
+        "image": "<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/images/og-image.jpg",
+        "servesCuisine": "Japanese",
+        "priceRange": "$$",
+        "acceptsReservations": true
+    }
+    </script>
     
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://platestpete.com/">
-    <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete">
-    <meta property="og:description" content="Authentic Japanese sushi and fusion cuisine in St. Petersburg, Florida. Fresh sashimi, creative rolls, and innovative fusion dishes.">
-    <meta property="og:image" content="https://platestpete.com/images/og-image.jpg">
+    <meta property="og:type" content="restaurant">
+    <meta property="og:url" content="<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?>">
+    <meta property="og:title" content="<?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete | Authentic Japanese Cuisine">
+    <meta property="og:description" content="Authentic Japanese sushi and fusion tapas in St. Petersburg, Florida. Chef Sean Thongsiri creates fresh sashimi, creative rolls, and innovative Asian fusion dishes.">
+    <meta property="og:image" content="<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/images/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Plate Sushi St. Pete - Beautiful rainbow sushi roll presentation">
     <meta property="og:site_name" content="Plate Sushi St. Pete">
+    <meta property="og:locale" content="en_US">
     
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://platestpete.com/">
-    <meta property="twitter:title" content="<?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete">
-    <meta property="twitter:description" content="Authentic Japanese sushi and fusion cuisine in St. Petersburg, Florida. Fresh sashimi, creative rolls, and innovative fusion dishes.">
-    <meta property="twitter:image" content="https://platestpete.com/images/og-image.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ?>">
+    <meta name="twitter:title" content="<?= htmlspecialchars($pageTitle) ?> - Plate Sushi St. Pete">
+    <meta name="twitter:description" content="Authentic Japanese sushi and fusion tapas in St. Petersburg, FL. Fresh sashimi, creative rolls & Asian fusion by Chef Sean Thongsiri.">
+    <meta name="twitter:image" content="<?= (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] ?>/images/og-image.jpg">
+    <meta name="twitter:image:alt" content="Plate Sushi St. Pete - Beautiful rainbow sushi roll presentation">
+    <meta name="twitter:creator" content="@PlateStPete">
+    <meta name="twitter:site" content="@PlateStPete">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -135,7 +174,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         .hero-section {
             text-align: center;
             padding: 80px 30px;
-            background: url('images/plate sushi rainbow roll.png');
+            background: url('/images/plate sushi rainbow roll.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -151,6 +190,18 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
+        .hero-logo {
+            height: 120px;
+            width: auto;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+        
+        .hero-logo:hover {
+            transform: scale(1.05);
+        }
+        
         .tagline {
             font-size: 1.3em;
             margin-bottom: 10px;
@@ -160,6 +211,31 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         .location {
             font-size: 1.1em;
             opacity: 0.9;
+        }
+        
+        .chef-signature {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        
+        .chef-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: #FFD700;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .chef-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            font-style: italic;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            letter-spacing: 0.5px;
         }
         
         .menu-filters {
@@ -316,6 +392,31 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--light-bg);
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .section-photo {
+            flex-shrink: 0;
+        }
+        
+        .section-image {
+            width: 200px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .section-image:hover {
+            transform: scale(1.05);
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .section-content {
+            flex: 1;
         }
         
         .section-title {
@@ -334,6 +435,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            overflow: visible;
         }
         
         .menu-item {
@@ -382,6 +484,8 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         
         .item-info {
             flex: 1;
+            min-width: 0;
+            overflow: hidden;
         }
         
         .item-name {
@@ -390,6 +494,22 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             margin-bottom: 5px;
             font-size: 1.1em;
             text-transform: uppercase;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-all;
+            hyphens: auto;
+            white-space: normal;
+            overflow: visible;
+            max-width: 100%;
+            line-height: 1.3;
+        }
+        
+        /* Force wrapping for very long wine names */
+        .menu-item .item-name {
+            display: block;
+            width: 100%;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         
         .item-description {
@@ -468,6 +588,34 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             font-size: 1.2em;
             margin-left: 15px;
             white-space: nowrap;
+        }
+        
+        .section-photo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background: #fafafa;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .section-photo-item .section-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 10px;
+        }
+        
+        .section-photo-item .section-description {
+            font-size: 0.85em;
+            color: #777;
+            font-style: italic;
+            text-align: center;
+            line-height: 1.3;
         }
         
         .admin-edit-link {
@@ -793,6 +941,12 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                 font-size: 2.5em;
             }
             
+            .chef-signature {
+                position: static;
+                text-align: center;
+                margin-top: 30px;
+            }
+            
             .menu-filters {
                 gap: 10px;
             }
@@ -815,9 +969,12 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
 <body>
     <div class="container">
         <div class="hero-section">
-            <h1>Plate Sushi St. Pete</h1>
+            <img src="/images/logo.png" alt="Plate Sushi St. Pete" class="hero-logo">
             <div class="tagline">Authentic Sushi & Fusion Tapas Experience</div>
-            <div class="location">St. Petersburg, Florida</div>
+            <div class="chef-signature">
+                <div class="chef-title">EXECUTIVE CHEF</div>
+                <div class="chef-name">Sean Thongsiri</div>
+            </div>
         </div>
         
         <div class="menu-filters">
@@ -863,17 +1020,29 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                             <?php foreach ($menu['sections'] as $section): ?>
                                 <div class="section">
                                     <div class="section-header">
+                                    <?php if ($section['photo']): ?>
+                                        <div class="section-photo">
+                                            <img src="<?= htmlspecialchars(strpos($section['photo'], '/') === 0 ? $section['photo'] : '/' . $section['photo']) ?>" 
+                                                 alt="<?= htmlspecialchars($section['name']) ?>" 
+                                                 class="section-image"
+                                                 onerror="this.style.display='none'">
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="section-content">
                                         <h3 class="section-title"><?= htmlspecialchars($section['name']) ?></h3>
                                         <?php if ($section['description']): ?>
                                             <p class="section-description"><?= htmlspecialchars($section['description']) ?></p>
                                         <?php endif; ?>
                                     </div>
+                                    </div>
                                     
                                     <div class="menu-items">
+                                        <?php if ($section['photo']): ?>
+                                        <?php endif; ?>
                                         <?php foreach ($section['items'] as $item): ?>
                                             <div class="menu-item" onclick="openItemLightbox(<?= $item['id'] ?>)">
                                                 <?php if ($isUserAdmin): ?>
-                                                    <a href="admin/items.php?edit=<?= $item['id'] ?>" 
+                                                    <a href="/admin/items?edit=<?= $item['id'] ?>"
                                                        class="admin-edit-link" 
                                                        target="_blank" 
                                                        onclick="event.stopPropagation();"
@@ -940,8 +1109,11 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             </div>
         <?php endif; ?>
         
-        <div class="restaurant-info">
+<div class="restaurant-info">
             <div class="website-url">Plate Sushi St. Pete</div>
+            <div style="text-align:center;font-size:0.9em;margin-top:10px;">
+                <a href="index.html" style="text-decoration: none; color: #777;">Return to Homepage</a>
+            </div>
             <p>Experience authentic flavors with our carefully crafted sushi and fusion tapas selections.</p>
             <p>Fresh ingredients • Traditional techniques • Modern presentation</p>
             <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 0.9em; color: #888;">
@@ -965,12 +1137,52 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
     </div>
     
     <script>
-        let currentMenuFilter = 'all';
+        // Base path configuration - now serving from domain root
+        const basePath = '/';
+        let currentMenuFilter = '<?= htmlspecialchars($filterMenu) ?>';
         let currentDietaryFilter = 'all';
         let currentImages = [];
         let currentImageIndex = 0;
 
+        // Parse URL path to extract menu filter for direct navigation
+        function parseUrlForMenuFilter() {
+            const path = window.location.pathname;
+            const menuMatch = path.match(/\/menu\/([a-zA-Z0-9_-]+)\/?$/);
+            if (menuMatch) {
+                return menuMatch[1];
+            }
+            return null;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if we need to override currentMenuFilter from URL path
+            const urlMenuFilter = parseUrlForMenuFilter();
+            if (urlMenuFilter && urlMenuFilter !== currentMenuFilter) {
+                currentMenuFilter = urlMenuFilter;
+                // Fetch the correct menu data since PHP couldn't parse the URL
+                setTimeout(() => fetchMenuData(), 100);
+            }
+            
+            // Initialize filter button states based on current URL
+            initializeFilterStates();
+            
+            function initializeFilterStates() {
+                // Update menu filter button states
+                document.querySelectorAll('.menu-filters .filter-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.menu === currentMenuFilter) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Update dietary filter button states (default to 'all')
+                document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.dietary === currentDietaryFilter) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
             // Add event listeners to menu filter buttons
             document.querySelectorAll('.menu-filters .filter-button').forEach(button => {
                 button.addEventListener('click', function() {
@@ -978,12 +1190,14 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                     document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Clear URL parameters for "All Menus"
+                    // Update URL for clean URLs
                     if (currentMenuFilter === 'all') {
-                        history.pushState({}, '', window.location.pathname);
+                        history.pushState({}, '', basePath + 'menu');
                         currentDietaryFilter = 'all';
                         document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
                         document.querySelector('.dietary-filters .filter-button.dietary').classList.add('active');
+                    } else {
+                        history.pushState({}, '', basePath + `menu/${currentMenuFilter}`);
                     }
                     
                     fetchMenuData();
@@ -999,7 +1213,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                     
                     if(currentDietaryFilter === 'all') {
                         // Clear URL parameters for "All Items"
-                        history.pushState({}, '', window.location.pathname);
+                        history.pushState({}, '', basePath + 'menu');
                         currentMenuFilter = 'all';
                         document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
                         document.querySelector('.menu-filters .filter-button.all').classList.add('active');
@@ -1018,7 +1232,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         function fetchMenuData() {
             const menuContainer = document.querySelector('.menu-container');
             const featuredContainer = document.querySelector('.featured-items');
-            const url = `api/get_menu_data.php?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`;
+            const url = `${basePath}api/get_menu_data?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`;
 
             // Show loading spinner
             menuContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div>`;
@@ -1084,8 +1298,18 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             return `
                 <div class="section">
                     <div class="section-header">
-                        <h3 class="section-title">${escapeHtml(section.name)}</h3>
-                        ${section.description ? `<p class="section-description">${escapeHtml(section.description)}</p>` : ''}
+                        ${section.photo ? `
+                            <div class="section-photo">
+                                <img src="${section.photo.startsWith('/') ? escapeHtml(section.photo) : '/' + escapeHtml(section.photo)}" 
+                                     alt="${escapeHtml(section.name)}" 
+                                     class="section-image"
+                                     onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+                        <div class="section-content">
+                            <h3 class="section-title">${escapeHtml(section.name)}</h3>
+                            ${section.description ? `<p class="section-description">${escapeHtml(section.description)}</p>` : ''}
+                        </div>
                     </div>
                     <div class="menu-items">
                         ${section.items.map(item => renderMenuItem(item)).join('')}
@@ -1101,7 +1325,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             return `
                 <div class="menu-item" onclick="openItemLightbox(${item.id})">
                     ${isAdmin ? `
-                        <a href="admin/items.php?edit=${item.id}" 
+                        <a href="admin/items?edit=${item.id}" 
                            class="admin-edit-link" 
                            target="_blank" 
                            onclick="event.stopPropagation();"
@@ -1151,7 +1375,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             document.getElementById('itemLightbox').style.display = 'block';
             
             // Fetch item details via AJAX
-            fetch(`get_item_details.php?id=${itemId}`)
+            fetch(`${basePath}get_item_details?id=${itemId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

@@ -415,6 +415,10 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--white);
     font-size: 1.5rem;
     font-weight: 600;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .menu-card:nth-child(2) .menu-card-image {
@@ -427,6 +431,27 @@ h1, h2, h3, h4, h5, h6 {
 
 .placeholder-food {
     font-family: var(--font-heading);
+}
+
+.menu-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    transition: background 0.3s ease;
+}
+
+.menu-card:hover .menu-card-overlay {
+    background: rgba(0, 0, 0, 0.7);
 }
 
 .menu-card-content {

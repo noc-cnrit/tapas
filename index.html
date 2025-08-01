@@ -4,6 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plate St. Pete - Modern Tapas & Sushi</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Authentic Japanese sushi and fusion tapas in St. Petersburg, Florida. Chef Sean Thongsiri creates fresh sashimi, creative rolls, and innovative Asian fusion dishes. Order online or dine-in.">
+    <meta name="keywords" content="sushi, sashimi, tapas, Japanese restaurant, Asian fusion, St. Petersburg, Florida, Chef Sean Thongsiri, fresh fish, sushi rolls, yakitori, ramen, poke bowls, sake, Japanese cuisine, St Pete dining">
+    <meta name="author" content="Plate Sushi St. Pete">
+    <meta name="robots" content="index, follow">
+    <meta name="geo.region" content="US-FL">
+    <meta name="geo.placename" content="St. Petersburg, Florida">
+    <meta name="geo.position" content="27.7676;-82.6403">
+    <meta name="ICBM" content="27.7676, -82.6403">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="restaurant">
+    <meta property="og:url" content="https://platestpete.com">
+    <meta property="og:title" content="Plate St. Pete - Modern Tapas & Sushi | Authentic Japanese Cuisine">
+    <meta property="og:description" content="Authentic Japanese sushi and fusion tapas in St. Petersburg, Florida. Chef Sean Thongsiri creates fresh sashimi, creative rolls, and innovative Asian fusion dishes.">
+    <meta property="og:image" content="https://platestpete.com/wp/wp-content/uploads/2025/08/plate-sushi-rainbow-roll-600x473.png">
+    <meta property="og:image:width" content="600">
+    <meta property="og:image:height" content="473">
+    <meta property="og:image:alt" content="Plate Sushi St. Pete - Beautiful rainbow sushi roll presentation">
+    <meta property="og:site_name" content="Plate Sushi St. Pete">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://platestpete.com">
+    <meta name="twitter:title" content="Plate St. Pete - Modern Tapas & Sushi">
+    <meta name="twitter:description" content="Authentic Japanese sushi and fusion tapas in St. Petersburg, FL. Fresh sashimi, creative rolls & Asian fusion by Chef Sean Thongsiri.">
+    <meta name="twitter:image" content="https://platestpete.com/wp/wp-content/uploads/2025/08/plate-sushi-rainbow-roll-600x473.png">
+    <meta name="twitter:image:alt" content="Plate Sushi St. Pete - Beautiful rainbow sushi roll presentation">
+    <meta name="twitter:creator" content="@PlateStPete">
+    <meta name="twitter:site" content="@PlateStPete">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+    <!-- Schema.org markup for Local Business -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Plate Sushi St. Pete",
+        "description": "Authentic Japanese sushi and fusion tapas restaurant in St. Petersburg, Florida",
+        "cuisine": ["Japanese", "Sushi", "Asian Fusion"],
+        "chef": {
+            "@type": "Person",
+            "name": "Sean Thongsiri",
+            "jobTitle": "Executive Chef"
+        },
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "St. Petersburg",
+            "addressRegion": "FL",
+            "addressCountry": "US"
+        },
+        "url": "https://platestpete.com",
+        "image": "https://platestpete.com/images/og-image.jpg",
+        "servesCuisine": "Japanese",
+        "priceRange": "$$",
+        "acceptsReservations": true
+    }
+    </script>
+    
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +107,7 @@
                 </h1>
                 <p class="hero-subtitle">Discover the perfect blend of traditional sushi artistry and innovative fusion tapas in the heart of St. Petersburg</p>
                 <div class="hero-buttons">
-                    <a href="#menu" class="btn btn-primary">View Menu</a>
+                    <a href="menu" class="btn btn-primary">View Menu</a>
                     <a href="#about" class="btn btn-secondary">Learn More</a>
                 </div>
             </div>
@@ -82,7 +148,7 @@
                     </div>
                     <h3>Facebook</h3>
                     <p>Like our page for daily specials, event announcements, and mouth-watering food photos!</p>
-                    <a href="#" class="social-btn facebook-btn" target="_blank">Follow on Facebook</a>
+                    <a href="https://www.facebook.com/PlateSushiStPete/" class="social-btn facebook-btn" target="_blank">Follow on Facebook</a>
                 </div>
                 
                 <div class="social-card instagram-card">
@@ -145,35 +211,41 @@
             
             <div class="menu-grid">
                 <div class="menu-card">
-                    <div class="menu-card-image">
-                        <div class="placeholder-food">Tapas</div>
+                    <div class="menu-card-image" style="background-image: url('images/duck-empanada.jpg'); background-size: cover; background-position: center;">
+                        <div class="menu-card-overlay">
+                            <h4>Food</h4>
+                        </div>
                     </div>
                     <div class="menu-card-content">
                         <h3>Small Plates & Tapas</h3>
                         <p>Innovative small plates perfect for sharing, featuring global flavors with a modern twist.</p>
-                        <a href="menu.php" class="menu-btn" target="_blank">View Tapas Menu</a>
+                        <a href="menu/food" class="menu-btn">View Food Menu</a>
                     </div>
                 </div>
                 
                 <div class="menu-card">
-                    <div class="menu-card-image">
-                        <div class="placeholder-food">Sushi</div>
+                    <div class="menu-card-image" style="background-image: url('images/plate sushi rainbow roll.png'); background-size: cover; background-position: center;">
+                        <div class="menu-card-overlay">
+                            <h4>Sushi</h4>
+                        </div>
                     </div>
                     <div class="menu-card-content">
                         <h3>Fresh Sushi & Rolls</h3>
                         <p>Premium sushi and specialty rolls crafted with the finest ingredients and artistic presentation.</p>
-                        <a href="menu.php" class="menu-btn" target="_blank">View Sushi Menu</a>
+                        <a href="menu/food" class="menu-btn">View Sushi Menu</a>
                     </div>
                 </div>
                 
                 <div class="menu-card">
-                    <div class="menu-card-image">
-                        <div class="placeholder-food">Drinks</div>
+                    <div class="menu-card-image" style="background-image: url('images/food/Plate-Cucumber-Bliss-Drink.jpg'); background-size: cover; background-position: center;">
+                        <div class="menu-card-overlay">
+                            <h4>Beverages</h4>
+                        </div>
                     </div>
                     <div class="menu-card-content">
                         <h3>Craft Beverages</h3>
                         <p>Signature cocktails, premium sake, and carefully selected wines to complement your dining experience.</p>
-                        <a href="menu.php" class="menu-btn" target="_blank">View Drinks Menu</a>
+                        <a href="menu/drinks" class="menu-btn">View Drinks Menu</a>
                     </div>
                 </div>
             </div>

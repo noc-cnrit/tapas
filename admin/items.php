@@ -673,10 +673,10 @@ function getItemDataForEdit($pdo, $itemId) {
         <h1>🍽️ Menu Item Management</h1>
         
         <div class="nav-links">
-            <a href="index.php">← Admin Dashboard</a>
-            <a href="menus.php">Manage Menus</a>
-            <a href="sections.php">Manage Sections</a>
-            <a href="login.php?logout=1">Logout</a>
+            <a href="index">← Admin Dashboard</a>
+            <a href="menus">Manage Menus</a>
+            <a href="sections">Manage Sections</a>
+            <a href="login?logout=1">Logout</a>
         </div>
 
         <?php if ($message): ?>

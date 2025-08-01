@@ -204,7 +204,7 @@ if (Auth::isAuthenticated()) {
         </form>
         
         <div class="back-link">
-            <a href="../index.php">← Back to Menu</a>
+            <a href="../">← Back to Menu</a>
         </div>
     </div>
 </body>

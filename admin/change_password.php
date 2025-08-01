@@ -226,7 +226,7 @@ if ($_POST && isset($_POST['action']) && $_POST['action'] === 'change_password')
         </form>
 
         <div class="logout-link">
-            <a href="login.php?logout=1">Logout</a>
+            <a href="login?logout=1">Logout</a>
         </div>
     </div>
 

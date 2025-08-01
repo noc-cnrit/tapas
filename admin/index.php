@@ -270,7 +270,7 @@ try {
                     <div class="user-name"><?= htmlspecialchars($user['name']) ?></div>
                     <div class="user-role"><?= htmlspecialchars(ucfirst($user['role'])) ?></div>
                 </div>
-                <a href="login.php?logout=1" class="logout-btn">Logout</a>
+                <a href="login?logout=1" class="logout-btn">Logout</a>
             </div>
         </div>
     </div>
@@ -289,7 +289,7 @@ try {
                     <div class="card-description">Create and organize top-level menus and control their display order</div>
                 </div>
                 <div class="card-body">
-                    <a href="menus.php" class="card-link">Manage Menus</a>
+                    <a href="menus" class="card-link">Manage Menus</a>
                 </div>
             </div>
             
@@ -300,7 +300,7 @@ try {
                     <div class="card-description">Organize menu sections and control which sections are visible</div>
                 </div>
                 <div class="card-body">
-                    <a href="sections.php" class="card-link">Manage Sections</a>
+                    <a href="sections" class="card-link">Manage Sections</a>
                 </div>
             </div>
             
@@ -311,7 +311,7 @@ try {
                     <div class="card-description">Add, edit, and manage individual menu items, prices, and descriptions</div>
                 </div>
                 <div class="card-body">
-                    <a href="items.php" class="card-link">Manage Items</a>
+                    <a href="items" class="card-link">Manage Items</a>
                 </div>
             </div>
             
@@ -322,7 +322,29 @@ try {
                     <div class="card-description">Preview the public menu as customers will see it</div>
                 </div>
                 <div class="card-body">
-                    <a href="../index.php" class="card-link" target="_blank">View Public Menu</a>
+                    <a href="../" class="card-link" target="_blank">View Public Menu</a>
+                </div>
+            </div>
+            
+            <div class="admin-card">
+                <div class="card-header import">
+                    <div class="card-icon">📝</div>
+                    <div class="card-title">WordPress Content</div>
+                    <div class="card-description">Manage WordPress integration and content sections</div>
+                </div>
+                <div class="card-body">
+                    <a href="../wp/wp-admin/" class="card-link" target="_blank">WordPress Admin</a>
+                </div>
+            </div>
+            
+            <div class="admin-card">
+                <div class="card-header qr-print">
+                    <div class="card-icon">📱</div>
+                    <div class="card-title">QR Code Print</div>
+                    <div class="card-description">Generate and print QR codes for menu access at tables</div>
+                </div>
+                <div class="card-body">
+                    <a href="qr-print" class="card-link" target="_blank">Print QR Codes</a>
                 </div>
             </div>
         </div>

@@ -36,22 +36,22 @@ def generate_qr_code(url, filename, title=""):
 def main():
     """Generate QR codes for all menu pages"""
     
-    # Base URL for the GitHub Pages site
-    base_url = "https://noc-cnrit.github.io/tapas"
+    # Base URL for the live restaurant website
+    base_url = "https://platestpete.com"
     
     # URLs and titles to generate QR codes for
     menu_items = {
         "home": {
             "url": f"{base_url}/",
-            "title": "🍣 Sushi Tapas Menu"
+            "title": "🍣 Plate Sushi St. Pete"
         },
         "main_menu": {
-            "url": f"{base_url}/menu.html",
-            "title": "🍣 Main Menu"
+            "url": f"{base_url}/menu",
+            "title": "🍣 Food Menu"
         },
         "special_menu": {
-            "url": f"{base_url}/special.html",
-            "title": "🍤 Special Menu"
+            "url": f"{base_url}/menu/drinks",
+            "title": "🍺 Drinks Menu"
         }
     }
     

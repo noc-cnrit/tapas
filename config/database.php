@@ -31,7 +31,8 @@ $httpHost = $isCli ? 'localhost' : ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
 // Auto-detect environment based on host
 $environment = (strpos($httpHost, 'localhost') !== false || 
-                strpos($httpHost, '127.0.0.1') !== false) ? 'local' : 'production';
+                strpos($httpHost, '127.0.0.1') !== false ||
+                strpos($httpHost, 'tapas') !== false) ? 'local' : 'production';
 
 // Get current environment config
 $config = $db_config[$environment];

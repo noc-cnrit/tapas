@@ -26,6 +26,7 @@ class MenuDAO {
                 s.id as section_id,
                 s.name as section_name,
                 s.description as section_description,
+                s.photo as section_photo,
                 s.display_order as section_order,
                 i.id as item_id,
                 i.name as item_name,
@@ -61,6 +62,7 @@ class MenuDAO {
                 s.id as section_id,
                 s.name as section_name,
                 s.description as section_description,
+                s.photo as section_photo,
                 s.display_order as section_order,
                 i.id as item_id,
                 i.name as item_name,
@@ -188,6 +190,7 @@ class MenuDAO {
                 'chefs_specials_section' as section_id,
                 'Today\'s Specials' as section_name,
                 'Hand-picked favorites from our chef' as section_description,
+                NULL as section_photo,
                 0 as section_order,
                 i.id as item_id,
                 i.name as item_name,
@@ -281,6 +284,7 @@ class MenuDAO {
                     'id' => $row['section_id'],
                     'name' => $row['section_name'],
                     'description' => $row['section_description'],
+                    'photo' => $row['section_photo'] ?? null,
                     'display_order' => $row['section_order'],
                     'items' => []
                 ];

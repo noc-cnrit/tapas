@@ -1267,7 +1267,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         function fetchMenuData() {
             const menuContainer = document.querySelector('.menu-container');
             const featuredContainer = document.querySelector('.featured-items');
-            const url = `${basePath}api/get_menu_data?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`;
+            const url = `${basePath}api/get_menu_data.php?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`;
 
             // Show loading spinner
             menuContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div>`;
@@ -1410,7 +1410,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             document.getElementById('itemLightbox').style.display = 'block';
             
             // Fetch item details via AJAX
-            fetch(`${basePath}get_item_details?id=${itemId}`)
+            fetch(`${basePath}get_item_details.php?id=${itemId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

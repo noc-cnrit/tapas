@@ -1445,18 +1445,21 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             if (images && images.length > 0) {
                 html += `
                     <div class="item-gallery">
-                        <img id="mainImage" src="${escapeHtml(images[0].path)}" 
-                             alt="${escapeHtml(images[0].alt)}" class="main-image">
+                        <img id="mainImage" src="${images[0].path.startsWith('/') ? escapeHtml(images[0].path) : '/' + escapeHtml(images[0].path)}" 
+                             alt="${escapeHtml(images[0].alt)}" class="main-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display:none; padding:20px; text-align:center; color:#999;">Image not available</div>
                 `;
                 
                 if (images.length > 1) {
                     html += '<div class="image-thumbnails">';
                     images.forEach((img, index) => {
                         html += `
-                            <img src="${escapeHtml(img.path)}" 
+                            <img src="${img.path.startsWith('/') ? escapeHtml(img.path) : '/' + escapeHtml(img.path)}" 
                                  alt="${escapeHtml(img.alt)}" 
                                  class="thumbnail ${index === 0 ? 'active' : ''}" 
-                                 onclick="changeImage(${index})">
+                                 onclick="changeImage(${index})"
+                                 onerror="this.style.opacity='0.3';">
                         `;
                     });
                     html += '</div>';
@@ -1544,7 +1547,8 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         function changeImage(index) {
             if (currentImages && currentImages[index]) {
                 const mainImage = document.getElementById('mainImage');
-                mainImage.src = currentImages[index].path;
+                const imagePath = currentImages[index].path;
+                mainImage.src = imagePath.startsWith('/') ? imagePath : '/' + imagePath;
                 mainImage.alt = currentImages[index].alt;
                 
                 // Update thumbnail active state

@@ -199,6 +199,28 @@ if ($_POST) {
                         $message = "Image order updated!";
                     }
                     break;
+                
+                case 'rotate_image':
+                    $imageId = $_POST['image_id'];
+                    $degrees = (int)$_POST['degrees'];
+                    
+                    // Get image path
+                    $pathStmt = $pdo->prepare("SELECT image_path FROM menu_item_images WHERE id = ?");
+                    $pathStmt->execute([$imageId]);
+                    $imagePath = $pathStmt->fetchColumn();
+                    
+                    if ($imagePath && file_exists('../' . $imagePath)) {
+                        try {
+                            $imageProcessor = new ImageProcessor();
+                            $imageProcessor->rotateImage('../' . $imagePath, $degrees);
+                            $message = "Image rotated {$degrees}° successfully!";
+                        } catch (Exception $e) {
+                            throw new Exception('Rotation failed: ' . $e->getMessage());
+                        }
+                    } else {
+                        throw new Exception('Image file not found.');
+                    }
+                    break;
             }
         }
     } catch (Exception $e) {
@@ -624,6 +646,21 @@ $wpImages = getWordPressImages();
                                     <input type="hidden" name="image_id" value="<?= $image['id'] ?>">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
+
+                                <div class="rotate-buttons">
+                                    <form method="POST" style="display: inline;">
+                                        <input type="hidden" name="action" value="rotate_image">
+                                        <input type="hidden" name="image_id" value="<?= $image['id'] ?>">
+                                        <input type="hidden" name="degrees" value="90">
+                                        <button type="submit" class="btn btn-secondary" title="Rotate 90° Right">↻ 90°</button>
+                                    </form>
+                                    <form method="POST" style="display: inline;">
+                                        <input type="hidden" name="action" value="rotate_image">
+                                        <input type="hidden" name="image_id" value="<?= $image['id'] ?>">
+                                        <input type="hidden" name="degrees" value="-90">
+                                        <button type="submit" class="btn btn-secondary" title="Rotate 90° Left">↺ 90°</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>

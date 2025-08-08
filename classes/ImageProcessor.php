@@ -328,5 +328,98 @@ class ImageProcessor {
         
         return $contexts[$context] ?? 'medium';
     }
-}
+    
+    /**
+     * Rotate an existing image and regenerate all sizes
+     * 
+     * @param string $imagePath Path to the image file
+     * @param int $degrees Rotation degrees (90, 180, 270)
+     * @return bool Success status
+     */
+    public function rotateImage($imagePath, $degrees) {
+        if (!file_exists($imagePath)) {
+            throw new Exception('Image file not found: ' . $imagePath);
+        }
+        
+        $validDegrees = [90, 180, 270, -90, -180, -270];
+        if (!in_array($degrees, $validDegrees)) {
+            throw new Exception('Invalid rotation degrees. Use 90, 180, or 270.');
+        }
+        
+        // Get image info
+        $imageInfo = getimagesize($imagePath);
+        if (!$imageInfo) {
+            throw new Exception('Unable to read image information.');
+        }
+        
+        $mimeType = $imageInfo['mime'];
+        
+        // Load the image
+        $sourceImage = $this->loadImage($imagePath, $mimeType);
+        
+        // Rotate the image
+        $rotatedImage = imagerotate($sourceImage, -$degrees, 0); // Negative because imagerotate rotates counter-clockwise
+        
+        if (!$rotatedImage) {
+            imagedestroy($sourceImage);
+            throw new Exception('Failed to rotate image.');
+        }
+        
+        // Save the rotated image back to the original path
+        $this->saveImage($rotatedImage, $imagePath, $mimeType);
+        
+        // Clean up
+        imagedestroy($sourceImage);
+        imagedestroy($rotatedImage);
+        
+        return true;
+    }
+    
+    /**
+     * Auto-fix image orientation based on EXIF data
+     * 
+     * @param string $imagePath Path to the image file
+     * @return bool True if rotation was applied, false if no rotation needed
+     */
+    public function autoFixOrientation($imagePath) {
+        if (!function_exists('exif_read_data') || !file_exists($imagePath)) {
+            return false;
+        }
+        
+        // Only works with JPEG images
+        $imageInfo = getimagesize($imagePath);
+        if (!$imageInfo || $imageInfo['mime'] !== 'image/jpeg') {
+            return false;
+        }
+        
+        try {
+            $exif = exif_read_data($imagePath);
+            if (!$exif || !isset($exif['Orientation'])) {
+                return false;
+            }
+            
+            $rotation = 0;
+            switch ($exif['Orientation']) {
+                case 3:
+                    $rotation = 180;
+                    break;
+                case 6:
+                    $rotation = 270;
+                    break;
+                case 8:
+                    $rotation = 90;
+                    break;
+                default:
+                    return false; // No rotation needed
+            }
+            
+            // Apply the rotation
+            $this->rotateImage($imagePath, $rotation);
+            return true;
+            
+        } catch (Exception $e) {
+            // EXIF data might be corrupted or missing
+            return false;
+        }
+    }
 ?>

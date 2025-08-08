@@ -2,16 +2,11 @@
 
 A comprehensive restaurant menu management system with admin panel, dietary icons, and QR code generation for easy customer access.
 
-## 🌐 Live Website
+## 🌐 Hosting Requirements
 
-**Test the website now:** https://noc-cnrit.github.io/tapas/
+**⚠️ Important:** This is a PHP application that requires a web server with PHP and MySQL support. It **cannot** be hosted on GitHub Pages or other static hosting services.
 
-### Quick Links:
-- **Main Website:**  https://noc-cnrit.github.io/tapas/
-- **Main Menu:**     https://noc-cnrit.github.io/tapas/menu.html
-- **Special Menu:**  https://noc-cnrit.github.io/tapas/special.html
-- **QR Codes Page:** https://noc-cnrit.github.io/tapas/qr-codes.html
-- **QR Generator:**  https://noc-cnrit.github.io/tapas/qr-generator.html
+**Recommended Hosting:** SiteGround, Bluehost, or any PHP hosting provider with MySQL/MariaDB support.
 
 ## Files Included
 
@@ -50,36 +45,20 @@ A comprehensive restaurant menu management system with admin panel, dietary icon
 - `MenuPage2SushiTapas.pdf` - Main menu PDF
 - `Scan2025-07-12_201937.pdf` - Special menu PDF
 
-## Setup Instructions
+## 🚀 Deployment Instructions
 
-### 1. Create GitHub Repository
-1. Go to [GitHub](https://github.com) and create a new repository
-2. Name it something like `sushi-fusion-menu` or `restaurant-menu`
-3. Make sure it's public (required for GitHub Pages)
+### For Production (SiteGround/PHP Hosting):
+1. **Upload Files**: Transfer all files to your hosting provider's public_html directory
+2. **Database Setup**: Configure `config/database.php` with your hosting database credentials
+3. **Initialize Database**: Run `database/setup.php` once to create tables and admin user
+4. **Admin Access**: Visit `yourdomain.com/admin/` to manage your menu
+5. **Generate QR Codes**: Use the QR generator at `yourdomain.com/qr-generator.html`
 
-### 2. Upload Files
-1. Upload all files from this directory to your new repository
-2. Make sure to upload both HTML files and PDF files
-
-### 3. Enable GitHub Pages
-1. Go to your repository settings
-2. Scroll down to "Pages" section
-3. Under "Source", select "Deploy from a branch"
-4. Choose "main" branch and "/ (root)" folder
-5. Click "Save"
-
-### 4. Get Your Website URL
-Your website will be available at:
-```
-https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/
-```
-
-### 5. Generate QR Codes
-1. Open `qr-generator.html` in your browser
-2. Replace "YOUR-USERNAME" and "YOUR-REPO" with your actual GitHub username and repository name
-3. Click "Generate QR Code" buttons to create QR codes
-4. Right-click and save the QR code images
-5. Print them and place at restaurant tables
+### For Version Control (GitHub Repository):
+1. This repository is for code management and collaboration only
+2. GitHub Pages **cannot** host PHP applications
+3. Use this repository to track changes and collaborate with developers
+4. Deploy to a PHP-compatible hosting service for live website
 
 ## 🛠️ Python Tools
 
@@ -126,24 +105,24 @@ pip install qrcode[pil]
 - **⭐ Chef's Specials Management** - Create and manage featured specials that appear prominently
 - **💾 Database-Driven** - All content stored in MySQL database
 
-## 📱 Testing the QR Codes
+## 📱 QR Code Management
 
-### Test with Your Phone:
-1. Open your phone's camera app
-2. Point it at any QR code on the [QR Codes Page](https://noc-cnrit.github.io/tapas/qr-codes.html)
-3. Tap the notification that appears
-4. The menu should open in your browser
+### Generate QR Codes:
+1. Visit `/qr-generator.html` on your hosted website
+2. Update URLs to match your domain
+3. Generate QR codes for different menu pages
+4. Download and print for table placement
 
-### QR Code Links:
-- **🍣 Main Website QR:** Opens https://noc-cnrit.github.io/tapas/
-- **🍣 Main Menu QR:** Opens https://noc-cnrit.github.io/tapas/menu.html
-- **🍤 Special Menu QR:** Opens https://noc-cnrit.github.io/tapas/special.html
+### QR Code Options:
+- **Main Website QR:** Links to your domain homepage
+- **Main Menu QR:** Links to the main menu page
+- **Special Menu QR:** Links to chef's specials
 
 ### For Restaurant Use:
-1. Visit the [QR Codes Page](https://noc-cnrit.github.io/tapas/qr-codes.html)
-2. Print the page (Ctrl+P or Cmd+P)
-3. Cut out individual QR codes
-4. Place them at restaurant tables
+1. Generate QR codes with your actual domain
+2. Print the QR codes page
+3. Cut out individual codes
+4. Place at restaurant tables
 5. Customers scan → instant menu access!
 
 ## Usage

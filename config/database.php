@@ -17,8 +17,25 @@ $db_config = [
     
     // SiteGround production settings
     'production' => [
-        'host' => '127.0.0.1', // SiteGround server IP
+        'host' => 'localhost', // SiteGround uses localhost for database connections
         'database' => 'dblplzygqhkye4', // Menu system database
+        'username' => 'urhgsgyruysgz',
+        'password' => 'pcyjeilfextq',
+        'charset' => 'utf8mb4'
+    ],
+    
+    // Alternative SiteGround configurations (uncomment if needed)
+    'siteground_alt1' => [
+        'host' => '127.0.0.1',
+        'database' => 'dblplzygqhkye4',
+        'username' => 'urhgsgyruysgz',
+        'password' => 'pcyjeilfextq',
+        'charset' => 'utf8mb4'
+    ],
+    
+    'siteground_alt2' => [
+        'host' => 'mysql.platestpete.com', // Sometimes hosting uses subdomain
+        'database' => 'dblplzygqhkye4',
         'username' => 'urhgsgyruysgz',
         'password' => 'pcyjeilfextq',
         'charset' => 'utf8mb4'
@@ -28,11 +45,38 @@ $db_config = [
 // Automatically detect environment (you can also set this manually)
 $isCli = php_sapi_name() === 'cli';
 $httpHost = $isCli ? 'localhost' : ($_SERVER['HTTP_HOST'] ?? 'localhost');
+$serverName = $_SERVER['SERVER_NAME'] ?? '';
+$documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
 
-// Auto-detect environment based on host
-$environment = (strpos($httpHost, 'localhost') !== false || 
-                strpos($httpHost, '127.0.0.1') !== false ||
-                strpos($httpHost, 'tapas') !== false) ? 'local' : 'production';
+// Enhanced environment detection
+$isLocal = (
+    strpos($httpHost, 'localhost') !== false ||
+    strpos($httpHost, '127.0.0.1') !== false ||
+    strpos($httpHost, 'tapas.local') !== false ||
+    strpos($httpHost, 'wamp') !== false ||
+    strpos($httpHost, 'xampp') !== false ||
+    strpos($documentRoot, 'wamp') !== false ||
+    strpos($documentRoot, 'xampp') !== false
+);
+
+$environment = $isLocal ? 'local' : 'production';
+
+// Optional: Force environment via environment variable or config file
+if (getenv('APP_ENV')) {
+    $environment = getenv('APP_ENV');
+}
+
+// Debug logging (remove in production)
+if (isset($_GET['debug_db']) && $_GET['debug_db'] === '1') {
+    echo "<pre>";
+    echo "Environment Detection Debug:\n";
+    echo "HTTP_HOST: " . $httpHost . "\n";
+    echo "SERVER_NAME: " . $serverName . "\n";
+    echo "DOCUMENT_ROOT: " . $documentRoot . "\n";
+    echo "Detected Environment: " . $environment . "\n";
+    echo "Database Host: " . $db_config[$environment]['host'] . "\n";
+    echo "</pre>";
+}
 
 // Get current environment config
 $config = $db_config[$environment];

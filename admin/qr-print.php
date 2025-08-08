@@ -247,7 +247,7 @@ Auth::refreshSession();
             <div class="qr-item">
                 <div class="qr-label">DRINKS</div>
                 <div class="qr-code" id="drinks-qr">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=172x172&data=https://platestpete.com/?menu=drinks" 
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=172x172&data=https://platestpete.com/menu/drinks" 
                          alt="Drinks Menu QR Code" 
                          style="width: 172px; height: 172px; border-radius: 6px;">
                 </div>

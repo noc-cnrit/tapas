@@ -33,8 +33,40 @@ require_once 'classes/Auth.php';
 // Initialize data access object
 $menuDAO = new MenuDAO();
 
-// Get filter parameter
-$filterMenu = isset($_GET['menu']) ? $_GET['menu'] : 'all';
+// Clean URL Routing - Parse URL path to determine menu filter
+function getMenuFromURL() {
+    // Get the REQUEST_URI and remove query parameters
+    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $uri = trim($uri, '/');
+    
+    // Check if this is a menu path
+    if (preg_match('/^menu(?:\/(.+))?$/', $uri, $matches)) {
+        if (isset($matches[1]) && !empty($matches[1])) {
+            // Clean up the menu type from URL
+            $menuType = trim($matches[1], '/');
+            
+            // Map URL segments to internal menu types
+            $menuMap = [
+                'food' => 'food',
+                'sushi' => 'sushi', 
+                'drinks' => 'drinks',
+                'special' => 'food', // map 'special' to 'food'
+                'chefs_specials' => 'chefs_specials',
+                'chef_specials' => 'chefs_specials',
+            ];
+            
+            return isset($menuMap[$menuType]) ? $menuMap[$menuType] : $menuType;
+        } else {
+            return 'all'; // /menu with no specific type
+        }
+    }
+    
+    // Not a menu URL, check query parameters
+    return isset($_GET['menu']) ? $_GET['menu'] : 'all';
+}
+
+// Get filter parameter from URL path or query parameter
+$filterMenu = getMenuFromURL();
 
 
 // Get data based on filter

@@ -11,7 +11,8 @@ echo "<p><strong>Timestamp:</strong> " . date('Y-m-d H:i:s') . "</p>\n";
 
 // Test admin URLs  
 $adminUrls = [
-    'Admin Dashboard' => '/admin/',
+    'Admin Dashboard (/)' => '/admin/',
+    'Admin Dashboard (/index)' => '/admin/index',
     'Admin Sections' => '/admin/sections',
     'Admin Items' => '/admin/items', 
     'Admin Menus' => '/admin/menus',

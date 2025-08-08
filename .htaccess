@@ -4,6 +4,8 @@
 RewriteEngine On
 
 # Admin section clean URLs
+RewriteRule ^admin/?$ /admin/index.php [L,QSA]
+RewriteRule ^admin/index/?$ /admin/index.php [L,QSA]
 RewriteRule ^admin/sections/?$ /admin/sections.php [L,QSA]
 RewriteRule ^admin/items/?$ /admin/items.php [L,QSA]
 RewriteRule ^admin/menus/?$ /admin/menus.php [L,QSA]

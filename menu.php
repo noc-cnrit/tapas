@@ -1112,7 +1112,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
 <div class="restaurant-info">
             <div class="website-url">Plate Sushi St. Pete</div>
             <div style="text-align:center;font-size:0.9em;margin-top:10px;">
-                <a href="index.html" style="text-decoration: none; color: #777;">Return to Homepage</a>
+                <a href="/index.html" style="text-decoration: none; color: #777;">Return to Homepage</a>
             </div>
             <p>Experience authentic flavors with our carefully crafted sushi and fusion tapas selections.</p>
             <p>Fresh ingredients • Traditional techniques • Modern presentation</p>

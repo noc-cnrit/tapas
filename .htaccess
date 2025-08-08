@@ -3,6 +3,15 @@
 
 RewriteEngine On
 
+# Admin section clean URLs
+RewriteRule ^admin/sections/?$ /admin/sections.php [L,QSA]
+RewriteRule ^admin/items/?$ /admin/items.php [L,QSA]
+RewriteRule ^admin/menus/?$ /admin/menus.php [L,QSA]
+RewriteRule ^admin/login/?$ /admin/login.php [L,QSA]
+RewriteRule ^admin/qr-print/?$ /admin/qr-print.php [L,QSA]
+RewriteRule ^admin/browse-images/?$ /admin/browse_images.php [L,QSA]
+RewriteRule ^admin/change-password/?$ /admin/change_password.php [L,QSA]
+
 # Clean URL Routing - Make nice URLs work directly (no redirects)
 # Single point of entry for all menu requests
 RewriteRule ^menu/?$ /index.php [L,QSA]

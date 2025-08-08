@@ -63,12 +63,29 @@ try {
     $allImages = [];
     
     // Gather images from all directories
+    $imagesByBaseName = []; // Track images by their base name to avoid duplicates
+    
     foreach ($imageDirectories as $dir) {
         if (is_dir($dir)) {
             $dirImages = getImagesFromDirectory($dir);
-            $allImages = array_merge($allImages, $dirImages);
+            
+            foreach ($dirImages as $img) {
+                // Create a normalized base name for deduplication
+                $baseName = strtolower(pathinfo($img['filename'], PATHINFO_FILENAME));
+                $baseName = preg_replace('/[-\s]+/', '-', $baseName); // Normalize spaces and dashes
+                $baseName = preg_replace('/^(food-|plate-)?/', '', $baseName); // Remove common prefixes
+                
+                // Only keep the newest version of each image
+                if (!isset($imagesByBaseName[$baseName]) || 
+                    $img['modified'] > $imagesByBaseName[$baseName]['modified']) {
+                    $imagesByBaseName[$baseName] = $img;
+                }
+            }
         }
     }
+    
+    // Convert back to indexed array
+    $allImages = array_values($imagesByBaseName);
     
     // Sort by modification date (newest first)
     usort($allImages, function($a, $b) {

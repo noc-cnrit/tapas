@@ -5,12 +5,8 @@
 ```
 C:\AI\
 ├── 📄 HTML Files (Root Level)
-│   ├── index.html              # Main landing page
-│   ├── menu.html               # Main menu display page
-│   ├── special.html            # Special menu display page
-│   ├── gallery.html            # Food gallery with lightbox
-│   ├── qr-codes.html          # QR codes display & print page
-│   └── qr-generator.html      # Web-based QR code generator
+│   ├── aboutus.html            # About page (was index.html)
+│   └── qr-codes.html          # QR codes display & print page
 │
 ├── 📁 images/                  # All image assets
 │   ├── 📁 food/               # Food photography
@@ -59,11 +55,12 @@ C:\AI\
 ## 🔗 File Relationships
 
 ### **HTML Pages Navigation:**
-- `index.html` → Links to all other pages
-- `menu.html` → Links to `images/menus/main_menu_image.jpg`
-- `special.html` → Links to `images/menus/special_menu_image.jpg`
-- `gallery.html` → Links to all `images/food/*.jpg` files
+- `aboutus.html` → Static about page (formerly index.html)
 - `qr-codes.html` → Links to all `images/qr-codes/*.png` files
+
+### **Dynamic System:**
+- `index.php` → Main dynamic menu entry point
+- PHP backend system manages menu display and admin functions
 
 ### **Asset Dependencies:**
 - **Homepage**: Uses 3 featured food images
@@ -81,12 +78,10 @@ C:\AI\
 **Base URL**: `https://noc-cnrit.github.io/tapas/`
 
 ### **Public Pages:**
-- `/` - Homepage with navigation
-- `/menu.html` - Main menu display
-- `/special.html` - Special menu display
-- `/gallery.html` - Food gallery
+- `/` - Dynamic menu system (index.php)
+- `/aboutus.html` - Static about page
 - `/qr-codes.html` - QR codes for printing
-- `/qr-generator.html` - QR code generator tool
+- `/wp/` - WordPress headless CMS for image management
 
 ### **Asset URLs:**
 - `/images/food/` - Food photography
@@ -118,9 +113,11 @@ C:\AI\
 
 ## 📝 Usage Notes
 
-1. **Adding New Food Photos**: Place in `images/food/` and update `gallery.html`
-2. **Updating Menus**: Replace files in `images/menus/` and `pdfs/`
-3. **New QR Codes**: Run `scripts/generate_qr_codes.py`
+1. **Managing Content**: Use the PHP admin system or WordPress headless CMS in `/wp/`
+2. **Adding Images**: Upload through WordPress interface for automatic optimization
+3. **Static Pages**: Edit `aboutus.html` and `qr-codes.html` directly
 4. **Documentation**: Add to `docs/` folder
+
+**Note**: This structure reflects the cleaned and reorganized codebase with simplified URL routing and WordPress integration.
 
 This organized structure makes the project professional, maintainable, and easy to work with! 🚀

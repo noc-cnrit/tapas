@@ -3,6 +3,22 @@
 
 RewriteEngine On
 
+# Clean URL Routing - Make nice URLs work directly (no redirects)
+# Single point of entry for all menu requests
+RewriteRule ^menu/?$ /index.php [L,QSA]
+RewriteRule ^menu/food/?$ /index.php?menu=food [L,QSA]
+RewriteRule ^menu/sushi/?$ /index.php?menu=sushi [L,QSA]
+RewriteRule ^menu/drinks/?$ /index.php?menu=drinks [L,QSA]
+RewriteRule ^menu/special/?$ /index.php?menu=food [L,QSA]
+RewriteRule ^menu/chefs?_?specials/?$ /index.php?menu=chefs_specials [L,QSA]
+
+# Handle legacy HTML files (redirect only the old static files)
+RewriteRule ^index\.html$ /aboutus.html [R=301,L]
+RewriteRule ^menu\.html$ /index.php [R=301,L]
+RewriteRule ^special\.html$ /index.php?menu=chefs_specials [R=301,L]
+RewriteRule ^gallery\.html$ /index.php [R=301,L]
+RewriteRule ^drinks\.html$ /index.php?menu=drinks [R=301,L]
+
 # Set default document - index.php is now our main page
 DirectoryIndex index.php
 

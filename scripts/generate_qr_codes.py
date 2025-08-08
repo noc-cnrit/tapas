@@ -50,7 +50,7 @@ def main():
             "title": "🍣 Food Menu"
         },
         "special_menu": {
-            "url": f"{base_url}/menu/drinks",
+            "url": f"{base_url}/?menu=drinks",
             "title": "🍺 Drinks Menu"
         }
     }

@@ -72,3 +72,9 @@ build/
 
 # Image optimization temp files
 *.tmp
+
+# Cache directory for thumbnails and optimized images
+cache/
+
+# Debug files created during development
+debug_*.php

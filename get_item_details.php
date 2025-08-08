@@ -44,16 +44,27 @@ try {
         throw new Exception('Item not found');
     }
     
-    // Get item images
+    // Get item images - prioritize optimized sizes
     $stmt = $pdo->prepare("
         SELECT 
             image_path,
             alt_text,
             caption,
-            is_primary
+            is_primary,
+            image_size,
+            width,
+            height
         FROM menu_item_images 
         WHERE item_id = ? 
-        ORDER BY is_primary DESC, display_order ASC
+        ORDER BY is_primary DESC, 
+                 CASE image_size 
+                     WHEN 'medium' THEN 1
+                     WHEN 'large' THEN 2
+                     WHEN 'full' THEN 3
+                     WHEN 'thumbnail' THEN 4
+                     ELSE 5 
+                 END,
+                 display_order ASC
     ");
     
     $stmt->execute([$itemId]);

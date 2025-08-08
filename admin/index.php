@@ -316,6 +316,17 @@ try {
             </div>
             
             <div class="admin-card">
+                <div class="card-header items">
+                    <div class="card-icon">📷</div>
+                    <div class="card-title">Item Images</div>
+                    <div class="card-description">Upload and manage optimized images for menu items with smart processing</div>
+                </div>
+                <div class="card-body">
+                    <a href="item_images.php" class="card-link">Manage Images</a>
+                </div>
+            </div>
+            
+            <div class="admin-card">
                 <div class="card-header menu">
                     <div class="card-icon">🌐</div>
                     <div class="card-title">View Menu</div>
@@ -323,17 +334,6 @@ try {
                 </div>
                 <div class="card-body">
                     <a href="../" class="card-link" target="_blank">View Public Menu</a>
-                </div>
-            </div>
-            
-            <div class="admin-card">
-                <div class="card-header import">
-                    <div class="card-icon">📝</div>
-                    <div class="card-title">WordPress Content</div>
-                    <div class="card-description">Manage WordPress integration and content sections</div>
-                </div>
-                <div class="card-body">
-                    <a href="../wp/wp-admin/" class="card-link" target="_blank">WordPress Admin</a>
                 </div>
             </div>
             

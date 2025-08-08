@@ -1,7 +1,8 @@
 <?php
 /**
- * Browse Images from WordPress Uploads
+ * Browse Local Images
  * Returns JSON list of images for section photo selection
+ * Updated to work with local image archive after WordPress elimination
  */
 
 require_once '../classes/Auth.php';
@@ -13,7 +14,6 @@ header('Content-Type: application/json');
 
 function getImagesFromDirectory($dir, $baseUrl = '') {
     $images = [];
-    $imageGroups = []; // Group images by base name
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     
     if (!is_dir($dir)) {
@@ -35,54 +35,17 @@ function getImagesFromDirectory($dir, $baseUrl = '') {
                 
                 $filename = $file->getFilename();
                 
-                // Extract base name (remove WordPress size suffixes like -150x150, -300x300, etc.)
-                $baseName = preg_replace('/-\d+x\d+\./', '.', $filename);
-                
                 // Get file info
                 $fileInfo = [
                     'path' => $relativePath,
                     'filename' => $filename,
                     'size' => $file->getSize(),
                     'modified' => $file->getMTime(),
-                    'base_name' => $baseName
+                    'base_name' => $filename // For local images, use filename as base name
                 ];
                 
-                // Group by base name
-                if (!isset($imageGroups[$baseName])) {
-                    $imageGroups[$baseName] = [];
-                }
-                $imageGroups[$baseName][] = $fileInfo;
+                $images[] = $fileInfo;
             }
-        }
-    }
-    
-    // For each group, pick the best version to display
-    foreach ($imageGroups as $baseName => $versions) {
-        $bestVersion = null;
-        $priority = 0;
-        
-        foreach ($versions as $version) {
-            $currentPriority = 0;
-            
-            // Priority system: prefer medium sizes, then thumbnails, then originals
-            if (strpos($version['filename'], '-300x') !== false) {
-                $currentPriority = 100; // Highest priority for 300x versions
-            } elseif (strpos($version['filename'], '-150x150.') !== false) {
-                $currentPriority = 90; // High priority for 150x150 thumbnails
-            } elseif (strpos($version['filename'], '-') === false) {
-                $currentPriority = 50; // Medium priority for original files
-            } else {
-                $currentPriority = 10; // Lower priority for other sizes
-            }
-            
-            if ($currentPriority > $priority) {
-                $priority = $currentPriority;
-                $bestVersion = $version;
-            }
-        }
-        
-        if ($bestVersion) {
-            $images[] = $bestVersion;
         }
     }
     
@@ -90,9 +53,27 @@ function getImagesFromDirectory($dir, $baseUrl = '') {
 }
 
 try {
-    // WordPress uploads directory
-    $uploadsDir = '../wp/wp-content/uploads';
-    $images = getImagesFromDirectory($uploadsDir);
+    // Local images directories - check multiple locations
+    $imageDirectories = [
+        '../images/archive',  // Main archive directory
+        '../images/food',     // Food images directory
+        '../images'           // Root images directory
+    ];
+    
+    $allImages = [];
+    
+    // Gather images from all directories
+    foreach ($imageDirectories as $dir) {
+        if (is_dir($dir)) {
+            $dirImages = getImagesFromDirectory($dir);
+            $allImages = array_merge($allImages, $dirImages);
+        }
+    }
+    
+    // Sort by modification date (newest first)
+    usort($allImages, function($a, $b) {
+        return $b['modified'] - $a['modified'];
+    });
     
     // Get search term from query parameter
     $searchTerm = isset($_GET['search']) ? strtolower(trim($_GET['search'])) : '';
@@ -102,7 +83,7 @@ try {
         $matchingImages = [];
         $partialMatches = [];
         
-        foreach ($images as $img) {
+        foreach ($allImages as $img) {
             $filename = strtolower($img['filename']);
             $baseName = strtolower($img['base_name']);
             
@@ -123,20 +104,24 @@ try {
         $images = array_slice($images, 0, 50);
         
     } else {
-        // No search term: show recent files with priority logic
-        $cheeseFiles = [];
+        // No search term: show recent files with some priority logic
+        $priorityFiles = [];
         $regularFiles = [];
         
-        foreach ($images as $img) {
-            if (stripos($img['filename'], 'cheesy') !== false || stripos($img['filename'], 'tator') !== false) {
-                $cheeseFiles[] = $img;
+        foreach ($allImages as $img) {
+            // Prioritize food-related images
+            if (stripos($img['filename'], 'food') !== false || 
+                stripos($img['filename'], 'dish') !== false ||
+                stripos($img['filename'], 'chicken') !== false ||
+                stripos($img['filename'], 'cheese') !== false) {
+                $priorityFiles[] = $img;
             } else {
                 $regularFiles[] = $img;
             }
         }
         
-        // Put cheesy files first, then regular files
-        $images = array_merge($cheeseFiles, $regularFiles);
+        // Put priority files first, then regular files
+        $images = array_merge($priorityFiles, $regularFiles);
         
         // Limit to 100 for browsing
         $images = array_slice($images, 0, 100);
@@ -146,11 +131,8 @@ try {
         'success' => true,
         'images' => $images,
         'count' => count($images),
-        'debug' => [
-            'total_files_found' => count($images),
-            'found_cheesy' => $foundCheesy,
-            'cheesy_files' => $cheeseFiles
-        ]
+        'total_found' => count($allImages),
+        'directories_scanned' => $imageDirectories
     ]);
     
 } catch (Exception $e) {

@@ -890,7 +890,7 @@ try {
                     
                     const images = data.images || [];
                     if (images.length === 0) {
-                        photoGrid.innerHTML = '<p>No images found in WordPress uploads directory.</p>';
+                        photoGrid.innerHTML = '<p>No images found in local image directories.</p>';
                         return;
                     }
                     
@@ -898,7 +898,9 @@ try {
                     images.forEach(img => {
                         const escapedPath = img.path.replace(/'/g, "\\'");
                         const escapedFilename = img.filename.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-                        gridHTML += '<img src="../' + img.path + '" class="thumbnail" onclick="selectPhoto(' + sectionId + ', \'' + escapedPath + '\')" title="' + escapedFilename + '" data-filename="' + img.filename.toLowerCase() + '">';
+                        // Use thumbnail endpoint for fast loading
+                        const thumbnailSrc = 'get_thumbnail.php?path=' + encodeURIComponent(img.path) + '&size=150';
+                        gridHTML += '<img src="' + thumbnailSrc + '" class="thumbnail" onclick="selectPhoto(' + sectionId + ', \'' + escapedPath + '\')" title="' + escapedFilename + '" data-filename="' + img.filename.toLowerCase() + '" loading="lazy">';
                     });
                     photoGrid.innerHTML = gridHTML;
                     
@@ -1000,7 +1002,9 @@ try {
                     images.forEach(img => {
                         const escapedPath = img.path.replace(/'/g, "\\'");
                         const escapedFilename = img.filename.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-                        gridHTML += '<img src="../' + img.path + '" class="thumbnail" onclick="selectPhoto(' + sectionId + ', \'' + escapedPath + '\')" title="' + escapedFilename + '" data-filename="' + img.filename.toLowerCase() + '">';
+                        // Use thumbnail endpoint for fast loading in search results too
+                        const thumbnailSrc = 'get_thumbnail.php?path=' + encodeURIComponent(img.path) + '&size=150';
+                        gridHTML += '<img src="' + thumbnailSrc + '" class="thumbnail" onclick="selectPhoto(' + sectionId + ', \'' + escapedPath + '\')" title="' + escapedFilename + '" data-filename="' + img.filename.toLowerCase() + '" loading="lazy">';
                     });
                     photoGrid.innerHTML = gridHTML;
                     

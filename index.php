@@ -1123,7 +1123,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             $featuredItemsWithImages = array_filter($featuredItems, function($item) {
                 return !empty($item['primary_image']);
             });
-        ?>
+        endif; ?>
         <?php if (!empty($featuredItemsWithImages)): ?>
             <div class="featured-items">
                 <h2 class="featured-title">🌟 Featured Dishes</h2>

@@ -739,6 +739,7 @@ function getItemDataForEdit($pdo, $itemId) {
                         <td><?= $item['image_count'] ?> images</td>
                         <td>
                             <button onclick="openEditModal(<?= $item['id'] ?>); return false;" class="action-btn btn-edit">Edit</button>
+                            <a href="item_images.php?item=<?= $item['id'] ?>" class="action-btn btn-edit" style="background-color: #6f42c1;">Images</a>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="action" value="toggle_hidden">
                                 <input type="hidden" name="item_id" value="<?= $item['id'] ?>">

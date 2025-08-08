@@ -1118,11 +1118,17 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             <?php endif; ?>
         </div>
         
-        <?php if ($filterMenu === 'all' && !empty($featuredItems)): ?>
+        <?php if ($filterMenu === 'all' && !empty($featuredItems)): 
+            // Filter featured items to include only those with images
+            $featuredItemsWithImages = array_filter($featuredItems, function($item) {
+                return !empty($item['primary_image']);
+            });
+        ?>
+        <?php if (!empty($featuredItemsWithImages)): ?>
             <div class="featured-items">
                 <h2 class="featured-title">🌟 Featured Dishes</h2>
                 <div class="featured-grid">
-                    <?php foreach ($featuredItems as $item): ?>
+                    <?php foreach ($featuredItemsWithImages as $item): ?>
                         <div class="featured-item" onclick="openItemLightbox(<?= $item['item_id'] ?>)">
                             <?php if ($item['primary_image']): ?>
                                 <img src="<?= htmlspecialchars($item['primary_image']) ?>" 

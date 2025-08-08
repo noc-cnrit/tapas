@@ -124,9 +124,11 @@ function itemMatchesDietaryFilter($item, $dietaryFilter) {
     switch ($dietaryFilter) {
         case 'gluten_free':
             // Check icons for gluten free
-            foreach ($item['icons'] as $icon) {
-                if ($icon['icon_name'] === 'gluten_free') {
-                    return true;
+            if (isset($item['icons']) && is_array($item['icons'])) {
+                foreach ($item['icons'] as $icon) {
+                    if ($icon['icon_name'] === 'gluten_free') {
+                        return true;
+                    }
                 }
             }
             // Also check dietary_info text
@@ -137,9 +139,11 @@ function itemMatchesDietaryFilter($item, $dietaryFilter) {
             
         case 'vegan':
             // Check icons for vegan
-            foreach ($item['icons'] as $icon) {
-                if ($icon['icon_name'] === 'vegan') {
-                    return true;
+            if (isset($item['icons']) && is_array($item['icons'])) {
+                foreach ($item['icons'] as $icon) {
+                    if ($icon['icon_name'] === 'vegan') {
+                        return true;
+                    }
                 }
             }
             // Also check dietary_info text
@@ -150,9 +154,11 @@ function itemMatchesDietaryFilter($item, $dietaryFilter) {
             
         case 'spicy':
             // Check icons for spicy
-            foreach ($item['icons'] as $icon) {
-                if ($icon['icon_name'] === 'spicy') {
-                    return true;
+            if (isset($item['icons']) && is_array($item['icons'])) {
+                foreach ($item['icons'] as $icon) {
+                    if ($icon['icon_name'] === 'spicy') {
+                        return true;
+                    }
                 }
             }
             // Check spice level
@@ -163,18 +169,22 @@ function itemMatchesDietaryFilter($item, $dietaryFilter) {
             
         case 'new':
             // Check icons for new
-            foreach ($item['icons'] as $icon) {
-                if ($icon['icon_name'] === 'new') {
-                    return true;
+            if (isset($item['icons']) && is_array($item['icons'])) {
+                foreach ($item['icons'] as $icon) {
+                    if ($icon['icon_name'] === 'new') {
+                        return true;
+                    }
                 }
             }
             return false;
             
         case 'popular':
             // Check icons for popular
-            foreach ($item['icons'] as $icon) {
-                if ($icon['icon_name'] === 'popular') {
-                    return true;
+            if (isset($item['icons']) && is_array($item['icons'])) {
+                foreach ($item['icons'] as $icon) {
+                    if ($icon['icon_name'] === 'popular') {
+                        return true;
+                    }
                 }
             }
             // Also check if it's featured
@@ -185,9 +195,11 @@ function itemMatchesDietaryFilter($item, $dietaryFilter) {
             
         case 'has_image':
             // Check icons for has_image
-            foreach ($item['icons'] as $icon) {
-                if ($icon['icon_name'] === 'has_image') {
-                    return true;
+            if (isset($item['icons']) && is_array($item['icons'])) {
+                foreach ($item['icons'] as $icon) {
+                    if ($icon['icon_name'] === 'has_image') {
+                        return true;
+                    }
                 }
             }
             // Also check if it has a primary image

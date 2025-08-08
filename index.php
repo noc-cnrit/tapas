@@ -1004,7 +1004,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
 <body>
     <div class="container">
         <div class="hero-section">
-            <img src="/images/logo.png" alt="Plate Sushi St. Pete" class="hero-logo">
+            <a href="/"><img src="/images/logo.png" alt="Plate Sushi St. Pete" class="hero-logo"></a>
             <div class="tagline">Authentic Sushi & Fusion Tapas Experience</div>
             <div class="chef-signature">
                 <div class="chef-title">EXECUTIVE CHEF</div>

@@ -1,55 +1,86 @@
-# 🍣 Sushi Tapas Menu Website - Project Structure
+# 🍣 Tapas Restaurant Website - Project Structure
 
 ## 📁 Directory Organization
 
 ```
-C:\AI\
-├── 📄 HTML Files (Root Level)
-│   ├── aboutus.html            # About page (was index.html)
-│   └── qr-codes.html          # QR codes display & print page
+tapas/
+├── 📄 Root Level Files
+│   ├── index.php              # Main dynamic menu system
+│   ├── aboutus.html           # About page
+│   ├── qr-codes.html         # QR codes display & print page
+│   ├── .htaccess             # Apache configuration
+│   ├── .gitignore            # Git ignore rules
+│   ├── .nojekyll             # Disable Jekyll on GitHub Pages
+│   ├── CNAME                 # Custom domain configuration
+│   ├── robots.txt            # Search engine crawler rules
+│   ├── sitemap.xml           # Site map for SEO
+│   ├── styles.css            # Main CSS styles
+│   ├── script.js             # Main JavaScript
+│   ├── config.json           # Deployment configuration
+│   └── get_item_details.php  # Item details API endpoint
 │
-├── 📁 images/                  # All image assets
-│   ├── 📁 food/               # Food photography
-│   │   ├── IMG_3471.jpeg.jpg
-│   │   ├── IMG_3472.jpeg.jpg
-│   │   ├── IMG_3475.jpeg.jpg
-│   │   ├── IMG_3477.jpeg.jpg
-│   │   ├── IMG_3478.jpg
-│   │   ├── IMG_3479.jpeg.jpg
-│   │   ├── IMG_3481.jpeg.jpg
-│   │   ├── IMG_3483.jpeg.jpg
-│   │   ├── IMG_3485.jpeg.jpg
-│   │   ├── IMG_3486.jpeg.jpg
-│   │   ├── IMG_3490.jpeg.jpg
-│   │   ├── IMG_3821.jpg
-│   │   ├── IMG_3822.jpeg.jpg
-│   │   ├── IMG_3825.jpeg.jpg
-│   │   ├── IMG_3826.jpeg.jpg
-│   │   └── IMG_3827.jpeg.jpg
-│   │
-│   ├── 📁 menus/              # Menu images (converted from PDFs)
-│   │   ├── main_menu_image.jpg
-│   │   └── special_menu_image.jpg
-│   │
-│   └── 📁 qr-codes/           # Generated QR code images
-│       ├── qr_code_home.png
-│       ├── qr_code_main_menu.png
-│       └── qr_code_special_menu.png
+├── 📁 admin/                  # Administration panel
+│   ├── index.php             # Admin dashboard
+│   ├── items.php             # Menu item management
+│   ├── menus.php             # Menu management
+│   ├── sections.php          # Menu section management
+│   ├── item_images.php       # Image management
+│   ├── media.php             # Media browser
+│   ├── qr-print.php          # QR code printing
+│   ├── check_shared_images.php # Image validation utility
+│   └── import.php.disabled    # Disabled import functionality
 │
-├── 📁 pdfs/                   # Original PDF files
-│   ├── MenuPage2SushiTapas.pdf
-│   └── Scan2025-07-12_201937.pdf
+├── 📁 api/                    # API endpoints
+│   └── get_menu_data.php     # Menu data API
 │
-├── 📁 scripts/                # Python automation scripts
-│   ├── convert_pdfs_to_images.py
-│   ├── generate_qr_codes.py
-│   └── update_gallery_paths.py
+├── 📁 classes/                # PHP class files
+│   ├── ImageProcessor.php    # Image processing utilities
+│   ├── MenuDAO.php          # Database access object
+│   └── QRCodeGenerator.php  # QR code generation
 │
-├── 📁 docs/                   # Documentation files
-│   └── PDF_TO_IMAGE_INSTRUCTIONS.md
+├── 📁 config/                 # Configuration files
+│   └── database.php         # Database connection config
 │
-├── 📄 README.md               # Main project documentation
-└── 📄 PROJECT_STRUCTURE.md    # This file
+├── 📁 database/               # Database scripts
+│   ├── menu_schema.sql      # Database schema
+│   └── sample_data.sql      # Sample menu data
+│
+├── 📁 images/                 # Image assets
+│   ├── 📁 assets/            # Site assets (logos, etc.)
+│   ├── 📁 food/              # Food photography
+│   ├── 📁 icons/             # Menu item icons
+│   ├── 📁 qr-codes/          # Generated QR codes
+│   └── 📁 stock-photos/      # Stock photography with attribution
+│
+├── 📁 js/                     # Additional JavaScript files
+│   └── admin.js             # Admin panel JavaScript
+│
+├── 📁 scripts/                # Utility scripts
+│   ├── generate_qr_codes.py  # QR code generation
+│   └── image_optimizer.py    # Image optimization
+│
+├── 📁 docs/                   # Documentation
+│   ├── ADMIN_SETUP.md        # Admin setup instructions
+│   ├── DATABASE_MIGRATION.md # Database migration guide
+│   └── PDF_TO_IMAGE_INSTRUCTIONS.md # PDF conversion guide
+│
+├── 📁 wp/                     # WordPress integration (headless)
+│   └── ... (WordPress files) # For image management
+│
+├── 📁 .well-known/            # Domain verification
+│   └── ... (verification files)
+│
+├── 📄 Documentation Files
+│   ├── README.md             # Main project documentation
+│   ├── CHANGELOG.md          # Version history
+│   ├── RECENT_UPDATES.md     # Latest changes summary
+│   └── PROJECT_STRUCTURE.md  # This file
+│
+└── 📄 Deployment Files
+    ├── deploy.php            # FTP deployment script
+    ├── deploy_curl.php       # cURL deployment script
+    ├── redirect.php          # URL redirection utility
+    └── wp_integration.php    # WordPress integration helper
 ```
 
 ## 🔗 File Relationships

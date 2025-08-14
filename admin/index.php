@@ -327,6 +327,17 @@ try {
             </div>
             
             <div class="admin-card">
+                <div class="card-header import">
+                    <div class="card-icon">📁</div>
+                    <div class="card-title">Media Management</div>
+                    <div class="card-description">Browse, manage and permanently delete image files from server storage</div>
+                </div>
+                <div class="card-body">
+                    <a href="media.php" class="card-link">Manage Media Files</a>
+                </div>
+            </div>
+            
+            <div class="admin-card">
                 <div class="card-header menu">
                     <div class="card-icon">🌐</div>
                     <div class="card-title">View Menu</div>
@@ -345,6 +356,17 @@ try {
                 </div>
                 <div class="card-body">
                     <a href="qr-print" class="card-link" target="_blank">Print QR Codes</a>
+                </div>
+            </div>
+            
+            <div class="admin-card">
+                <div class="card-header menu">
+                    <div class="card-icon">🔐</div>
+                    <div class="card-title">Change Password</div>
+                    <div class="card-description">Update your admin account password for security</div>
+                </div>
+                <div class="card-body">
+                    <a href="change_password.php" class="card-link">Change Password</a>
                 </div>
             </div>
         </div>

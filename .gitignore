@@ -23,7 +23,6 @@ config/database.php.backup
 wp-config.php.backup
 
 # Development and testing artifacts
-vegas-style/
 .well-known/
 
 # Adobe Dreamweaver files

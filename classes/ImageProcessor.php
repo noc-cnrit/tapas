@@ -422,4 +422,5 @@ class ImageProcessor {
             return false;
         }
     }
+}
 ?>

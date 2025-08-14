@@ -653,10 +653,25 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             line-height: 1.3;
         }
         
-        .admin-edit-link {
+        .admin-controls {
             position: absolute;
             top: 8px;
             left: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .menu-item:hover .admin-controls {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .admin-edit-link,
+        .admin-image-link {
             background: rgba(76, 175, 80, 0.9);
             color: white;
             padding: 4px 8px;
@@ -664,18 +679,20 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             font-size: 0.8em;
             text-decoration: none;
             transition: all 0.3s ease;
-            z-index: 10;
-            opacity: 0;
-            transform: translateY(-10px);
+            white-space: nowrap;
         }
         
-        .menu-item:hover .admin-edit-link {
-            opacity: 1;
-            transform: translateY(0);
+        .admin-image-link {
+            background: rgba(33, 150, 243, 0.9);
         }
         
         .admin-edit-link:hover {
             background: rgba(76, 175, 80, 1);
+            transform: scale(1.05);
+        }
+        
+        .admin-image-link:hover {
+            background: rgba(33, 150, 243, 1);
             transform: scale(1.05);
         }
         
@@ -1077,13 +1094,22 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                                         <?php foreach ($section['items'] as $item): ?>
                                             <div class="menu-item" onclick="openItemLightbox(<?= $item['id'] ?>)">
                                                 <?php if ($isUserAdmin): ?>
-                                                    <a href="/admin/items?edit=<?= $item['id'] ?>"
-                                                       class="admin-edit-link" 
-                                                       target="_blank" 
-                                                       onclick="event.stopPropagation();"
-                                                       title="Edit this item">
-                                                        ✏️ Edit
-                                                    </a>
+                                                    <div class="admin-controls">
+                                                        <a href="/admin/items?edit=<?= $item['id'] ?>"
+                                                           class="admin-edit-link" 
+                                                           target="_blank" 
+                                                           onclick="event.stopPropagation();"
+                                                           title="Edit this item">
+                                                            ✏️ Edit
+                                                        </a>
+                                                        <a href="/admin/item_images.php?item=<?= $item['id'] ?>" 
+                                                           class="admin-image-link" 
+                                                           target="_blank" 
+                                                           onclick="event.stopPropagation();"
+                                                           title="Manage images for this item">
+                                                            📷 Images
+                                                        </a>
+                                                    </div>
                                                 <?php endif; ?>
                                                 <div class="item-info">
                                                     <div class="item-name"><?= htmlspecialchars($item['name']) ?></div>
@@ -1161,7 +1187,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                 <p>&copy; 2025 Computer Networking Resources (CNR), Savannah, Georgia. All rights reserved.</p>
                 <p>Website developed by CNR • <a href="https://cnrit.com" target="_blank" style="color: #4CAF50; text-decoration: none;">cnrit.com</a></p>
                 <?php if ($isUserAdmin): ?>
-                    <p><a href="admin/" style="color: #4CAF50; text-decoration: none;">Admin Section</a></p>
+                    <p><a href="/admin/" style="color: #4CAF50; text-decoration: none;">Admin Section</a></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -1195,106 +1221,137 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             return null;
         }
 
+        // Use event delegation - attach listeners to document body
+        document.addEventListener('click', function(event) {
+            // Handle menu filter buttons
+            if (event.target.matches('.menu-filters .filter-button')) {
+                event.preventDefault();
+                console.log('Menu button clicked via delegation:', event.target.dataset.menu);
+                
+                currentMenuFilter = event.target.dataset.menu;
+                document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                
+                // Update URL for clean URLs
+                if (currentMenuFilter === 'all') {
+                    history.pushState({}, '', basePath + 'menu');
+                    currentDietaryFilter = 'all';
+                    document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                    const firstDietaryBtn = document.querySelector('.dietary-filters .filter-button.dietary');
+                    if (firstDietaryBtn) firstDietaryBtn.classList.add('active');
+                } else {
+                    history.pushState({}, '', basePath + 'menu/' + currentMenuFilter);
+                }
+                
+                fetchMenuData();
+                return;
+            }
+            
+            // Handle dietary filter buttons
+            if (event.target.matches('.dietary-filters .filter-button')) {
+                event.preventDefault();
+                console.log('Dietary button clicked via delegation:', event.target.dataset.dietary);
+                
+                currentDietaryFilter = event.target.dataset.dietary;
+                document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                
+                if(currentDietaryFilter === 'all') {
+                    // Clear URL parameters for "All Items"
+                    history.pushState({}, '', basePath + 'menu');
+                    currentMenuFilter = 'all';
+                    document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                    const allBtn = document.querySelector('.menu-filters .filter-button.all');
+                    if (allBtn) allBtn.classList.add('active');
+                    fetchMenuData();
+                } else {
+                    // Set menu to "all" for dietary filters to show items across all menus
+                    currentMenuFilter = 'all';
+                    document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                    const allBtn = document.querySelector('.menu-filters .filter-button.all');
+                    if (allBtn) allBtn.classList.add('active');
+                    fetchMenuData();
+                }
+                return;
+            }
+        });
+        
+        // Simple DOMContentLoaded initialization
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            
             // Check if we need to override currentMenuFilter from URL path
             const urlMenuFilter = parseUrlForMenuFilter();
             if (urlMenuFilter && urlMenuFilter !== currentMenuFilter) {
                 currentMenuFilter = urlMenuFilter;
+                console.log('URL override detected:', urlMenuFilter);
                 // Fetch the correct menu data since PHP couldn't parse the URL
-                setTimeout(() => fetchMenuData(), 100);
+                fetchMenuData();
             }
             
             // Initialize filter button states based on current URL
-            initializeFilterStates();
+            updateFilterButtonStates();
             
-            function initializeFilterStates() {
-                // Update menu filter button states
-                document.querySelectorAll('.menu-filters .filter-button').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.menu === currentMenuFilter) {
-                        btn.classList.add('active');
-                    }
-                });
-                
-                // Update dietary filter button states (default to 'all')
-                document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.dietary === currentDietaryFilter) {
-                        btn.classList.add('active');
-                    }
-                });
-            }
-            // Add event listeners to menu filter buttons
-            document.querySelectorAll('.menu-filters .filter-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    currentMenuFilter = this.dataset.menu;
-                    document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update URL for clean URLs
-                    if (currentMenuFilter === 'all') {
-                        history.pushState({}, '', basePath + 'menu');
-                        currentDietaryFilter = 'all';
-                        document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
-                        document.querySelector('.dietary-filters .filter-button.dietary').classList.add('active');
-                    } else {
-                        history.pushState({}, '', basePath + `menu/${currentMenuFilter}`);
-                    }
-                    
-                    fetchMenuData();
-                });
-            });
-
-            // Add event listeners to dietary filter buttons
-            document.querySelectorAll('.dietary-filters .filter-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    currentDietaryFilter = this.dataset.dietary;
-                    document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    if(currentDietaryFilter === 'all') {
-                        // Clear URL parameters for "All Items"
-                        history.pushState({}, '', basePath + 'menu');
-                        currentMenuFilter = 'all';
-                        document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
-                        document.querySelector('.menu-filters .filter-button.all').classList.add('active');
-                        fetchMenuData();
-                    } else {
-                        // Set menu to "all" for dietary filters to show items across all menus
-                        currentMenuFilter = 'all';
-                        document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
-                        document.querySelector('.menu-filters .filter-button.all').classList.add('active');
-                        fetchMenuData();
-                    }
-                });
-            });
+            console.log('Initialization complete');
         });
+        
+        function updateFilterButtonStates() {
+            // Update menu filter button states
+            document.querySelectorAll('.menu-filters .filter-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.menu === currentMenuFilter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update dietary filter button states
+            document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.dietary === currentDietaryFilter) {
+                    btn.classList.add('active');
+                }
+            });
+        }
 
         function fetchMenuData() {
             const menuContainer = document.querySelector('.menu-container');
             const featuredContainer = document.querySelector('.featured-items');
-            const url = `${basePath}api/get_menu_data.php?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`;
+            
+            // Ensure we have valid values
+            if (!currentMenuFilter) currentMenuFilter = 'all';
+            if (!currentDietaryFilter) currentDietaryFilter = 'all';
+            
+            const url = basePath + 'api/get_menu_data.php?menu=' + encodeURIComponent(currentMenuFilter) + '&dietary=' + encodeURIComponent(currentDietaryFilter);
 
             // Show loading spinner
             menuContainer.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Loading...</p></div>`;
             if(featuredContainer) featuredContainer.style.display = 'none';
 
+            console.log('Fetching menu data from:', url);
+
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Menu data received:', data);
                     if (data.success) {
                         updatePageContent(data);
                         // Only update URL if not "All Items" (which clears parameters)
                         if (currentDietaryFilter !== 'all') {
-                            history.pushState({menu: currentMenuFilter, dietary: currentDietaryFilter}, '', `?menu=${currentMenuFilter}&dietary=${currentDietaryFilter}`);
+                            history.pushState({menu: currentMenuFilter, dietary: currentDietaryFilter}, '', '?menu=' + encodeURIComponent(currentMenuFilter) + '&dietary=' + encodeURIComponent(currentDietaryFilter));
                         }
                     } else {
-                        menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Error</h2><p>${data.error}</p></div>`;
+                        menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Error</h2><p>${data.error || 'Unknown error occurred'}</p></div>`;
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching menu data:', error);
-                    menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Error</h2><p>Could not connect to the server.</p></div>`;
+                    menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Connection Error</h2><p>Could not connect to the server. Please check your connection and try again.</p><p><small>URL: ${url}</small></p></div>`;
                 });
         }
 
@@ -1366,13 +1423,22 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             return `
                 <div class="menu-item" onclick="openItemLightbox(${item.id})">
                     ${isAdmin ? `
-                        <a href="admin/items?edit=${item.id}" 
-                           class="admin-edit-link" 
-                           target="_blank" 
-                           onclick="event.stopPropagation();"
-                           title="Edit this item">
-                            ✏️ Edit
-                        </a>
+                        <div class="admin-controls">
+                            <a href="/admin/items?edit=${item.id}"
+                               class="admin-edit-link" 
+                               target="_blank" 
+                               onclick="event.stopPropagation();"
+                               title="Edit this item">
+                                ✏️ Edit
+                            </a>
+                            <a href="/admin/item_images.php?item=${item.id}"
+                               class="admin-image-link" 
+                               target="_blank" 
+                               onclick="event.stopPropagation();"
+                               title="Manage images for this item">
+                                📷 Images
+                            </a>
+                        </div>
                     ` : ''}
                     <div class="item-info">
                         <div class="item-name">${escapeHtml(item.name)}</div>

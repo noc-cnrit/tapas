@@ -47,9 +47,10 @@ try {
         $menus = $chefsSpecials ? [$chefsSpecials] : [];
         $pageTitle = "Chef's Specials";
     } else {
-        $singleMenu = $menuDAO->getMenuByName(ucfirst($filterMenu));
+        $menuName = ucfirst($filterMenu);
+        $singleMenu = $menuDAO->getMenuByName($menuName);
         $menus = $singleMenu ? [$singleMenu] : [];
-        $pageTitle = ucfirst($filterMenu) . " Menu";
+        $pageTitle = $menuName . " Menu";
     }
     
     // Apply dietary filters if specified

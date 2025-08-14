@@ -220,14 +220,18 @@ Auth::refreshSession();
 </head>
 <body>
     <div class="admin-controls">
-        <a href="./" class="admin-btn">← Back to Dashboard</a>
+        <a href="./" class="admin-btn">← Dashboard</a>
+        <a href="menus.php" class="admin-btn">Menus</a>
+        <a href="sections.php" class="admin-btn">Sections</a>
+        <a href="items.php" class="admin-btn">Items</a>
+        <a href="item_images.php" class="admin-btn">Images</a>
         <button onclick="window.print()" class="admin-btn print-btn">🖨️ Print</button>
-        <button onclick="generatePDF()" class="admin-btn">📄 Generate PDF</button>
+        <button onclick="generatePDF()" class="admin-btn">📄 PDF</button>
     </div>
 
     <div class="container">
         <div class="header">
-            <img src="../vegas-style/images/food/Plate-Sushi-Logo.png" alt="Plate Sushi St. Pete Logo" style="max-height: 100px; margin-bottom: 20px;">
+            <img src="../images/assets/Plate-Sushi-Logo.png" alt="Plate Sushi St. Pete Logo" style="max-height: 100px; margin-bottom: 20px;">
             <div class="tagline">Authentic Sushi & Fusion Tapas Experience</div>
         </div>
         

@@ -542,6 +542,9 @@ try {
             <a href="index">← Admin Dashboard</a>
             <a href="menus">Manage Menus</a>
             <a href="items">Manage Items</a>
+            <a href="item_images.php">Item Images</a>
+            <a href="qr-print">QR Codes</a>
+            <a href="change_password.php">Change Password</a>
             <a href="login?logout=1">Logout</a>
         </div>
 

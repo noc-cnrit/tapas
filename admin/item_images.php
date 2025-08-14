@@ -132,14 +132,9 @@ if ($_POST) {
                     $imageData = $pathStmt->fetch();
                     
                     if ($imageData) {
-                        // Delete from database
+                        // Remove image association from this menu item (unlink only)
                         $deleteStmt = $pdo->prepare("DELETE FROM menu_item_images WHERE id = ?");
                         $deleteStmt->execute([$imageId]);
-                        
-                        // Delete file if it's in our images folder (not WordPress)
-                        if (strpos($imageData['image_path'], 'images/food/') === 0 && file_exists('../' . $imageData['image_path'])) {
-                            unlink('../' . $imageData['image_path']);
-                        }
                         
                         // If this was primary, make the next one primary
                         if ($imageData['is_primary']) {
@@ -160,7 +155,7 @@ if ($_POST) {
                             $removeIconStmt->execute([$itemId]);
                         }
                         
-                        $message = "Image deleted successfully!";
+                        $message = "Image removed from menu item successfully!";
                     }
                     break;
                 
@@ -585,8 +580,13 @@ $wpImages = getWordPressImages();
             <h1>Menu Item Image Management</h1>
             <div class="nav-links">
                 <a href="index.php">← Dashboard</a>
+                <a href="menus.php">Manage Menus</a>
+                <a href="sections.php">Manage Sections</a>
                 <a href="items.php">Menu Items</a>
-                <a href="sections.php">Sections</a>
+                <a href="media.php">📁 Media Management</a>
+                <a href="qr-print.php">QR Codes</a>
+                <a href="change_password.php">Change Password</a>
+                <a href="login.php?logout=1">Logout</a>
             </div>
         </div>
         
@@ -603,7 +603,7 @@ $wpImages = getWordPressImages();
             <div class="item-info" style="background: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
                 <h2>Managing Images for: <?= htmlspecialchars($item['name']) ?></h2>
                 <p><strong>Section:</strong> <?= htmlspecialchars($item['section_name']) ?> | <strong>Menu:</strong> <?= htmlspecialchars($item['menu_name']) ?></p>
-                <a href="item_images.php" class="btn btn-secondary">← Back to Item List</a>
+                <button onclick="history.back()" class="btn btn-secondary">← Back</button>
             </div>
             
             <!-- Current Images -->
@@ -627,7 +627,7 @@ $wpImages = getWordPressImages();
                                 <input type="hidden" name="image_id" value="<?= $image['id'] ?>">
                                 <input type="text" name="alt_text" value="<?= htmlspecialchars($image['alt_text']) ?>" 
                                        placeholder="Alt text" class="form-control" style="margin-bottom: 5px;">
-                                <input type="text" name="caption" value="<?= htmlspecialchars($image['caption']) ?>" 
+                                <input type="text" name="caption" value="<?= htmlspecialchars($image['caption'] ?? '') ?>" 
                                        placeholder="Caption" class="form-control" style="margin-bottom: 10px;">
                                 <button type="submit" class="btn btn-success">Update</button>
                             </form>
@@ -641,10 +641,10 @@ $wpImages = getWordPressImages();
                                 </form>
                                 <?php endif; ?>
                                 
-                                <form method="POST" style="display: inline;">
+                                <form method="POST" style="display: inline;" onsubmit="return confirmRemove()">
                                     <input type="hidden" name="action" value="delete_image">
                                     <input type="hidden" name="image_id" value="<?= $image['id'] ?>">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                    <button type="submit" class="btn btn-danger">Remove</button>
                                 </form>
 
                                 <div class="rotate-buttons">
@@ -879,6 +879,11 @@ $wpImages = getWordPressImages();
             }
         });
         <?php endif; ?>
+        
+        // Confirmation for remove action
+        function confirmRemove() {
+            return confirm('Are you sure you want to remove this image from the menu item?\n\nNote: This will only remove the image association - the image file itself will remain on the server.');
+        }
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {

@@ -96,10 +96,19 @@ function filterMenusByDietary($menus, $dietaryFilter) {
             $filteredSection = $section;
             $filteredSection['items'] = [];
             
-            foreach ($section['items'] as $item) {
-                // Check if item matches dietary filter
-                if (itemMatchesDietaryFilter($item, $dietaryFilter)) {
-                    $filteredSection['items'][] = $item;
+            // Special handling for sushi_tapas filter - check section name
+            if ($dietaryFilter === 'sushi_tapas') {
+                // Only include items from sections named "SUSHI TAPAS" (case insensitive)
+                if (stripos($section['name'], 'SUSHI TAPAS') !== false) {
+                    $filteredSection['items'] = $section['items'];
+                }
+            } else {
+                // Regular dietary filtering by item properties
+                foreach ($section['items'] as $item) {
+                    // Check if item matches dietary filter
+                    if (itemMatchesDietaryFilter($item, $dietaryFilter)) {
+                        $filteredSection['items'][] = $item;
+                    }
                 }
             }
             

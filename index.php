@@ -48,7 +48,7 @@ function getMenuFromURL() {
             // Map URL segments to internal menu types
             $menuMap = [
                 'food' => 'food',
-                'sushi' => 'sushi', 
+                'sushi' => 'sushi_tapas_special', // Special handling for sushi filter
                 'drinks' => 'drinks',
                 'special' => 'food', // map 'special' to 'food'
                 'chefs_specials' => 'chefs_specials',
@@ -82,10 +82,25 @@ if ($filterMenu === 'all') {
     $chefsSpecials = $menuDAO->getChefsSpecials();
     $menus = $chefsSpecials ? [$chefsSpecials] : [];
     $pageTitle = "Chef's Specials";
+} elseif ($filterMenu === 'sushi_tapas_special') {
+    // Special handling for sushi filter - get all menus but will be filtered by dietary filter
+    $menus = $menuDAO->getAllMenus();
+    $chefsSpecials = $menuDAO->getChefsSpecials();
+    if ($chefsSpecials) {
+        array_unshift($menus, $chefsSpecials);
+    }
+    $pageTitle = "Sushi Menu";
+    // Set a flag to apply sushi filtering
+    $_GET['dietary'] = 'sushi_tapas';
 } else {
     $singleMenu = $menuDAO->getMenuByName(ucfirst($filterMenu));
     $menus = $singleMenu ? [$singleMenu] : [];
     $pageTitle = ucfirst($filterMenu) . " Menu";
+}
+
+// Apply dietary filters if necessary
+if (isset($_GET['dietary']) && $_GET['dietary'] === 'sushi_tapas' && !empty($menus)) {
+    $menus = filterMenusByDietary($menus, 'sushi_tapas');
 }
 
 // Get menu names for navigation
@@ -96,6 +111,43 @@ $featuredItems = $menuDAO->getFeaturedItems(4);
 
 // Check authentication status for use throughout the page
 $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
+
+/**
+ * Filter menus by dietary restrictions (for PHP processing)
+ */
+function filterMenusByDietary($menus, $dietaryFilter) {
+    $filteredMenus = [];
+    
+    foreach ($menus as $menu) {
+        $filteredMenu = $menu;
+        $filteredMenu['sections'] = [];
+        
+        foreach ($menu['sections'] as $section) {
+            $filteredSection = $section;
+            $filteredSection['items'] = [];
+            
+            // Special handling for sushi_tapas filter - check section name
+            if ($dietaryFilter === 'sushi_tapas') {
+                // Only include items from sections named "SUSHI TAPAS" (case insensitive)
+                if (stripos($section['name'], 'SUSHI TAPAS') !== false) {
+                    $filteredSection['items'] = $section['items'];
+                }
+            }
+            
+            // Only include section if it has items
+            if (!empty($filteredSection['items'])) {
+                $filteredMenu['sections'][] = $filteredSection;
+            }
+        }
+        
+        // Only include menu if it has sections with items
+        if (!empty($filteredMenu['sections'])) {
+            $filteredMenus[] = $filteredMenu;
+        }
+    }
+    
+    return $filteredMenus;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -283,32 +335,40 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         
         .filter-button {
             padding: 12px 24px;
-            border: none;
-            border-radius: var(--border-radius);
-            background: linear-gradient(135deg, var(--secondary-color), #1976D2);
-            color: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #888888;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1em;
+            font-weight: 500;
+            font-size: 0.95em;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow);
             cursor: pointer;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-family: 'Georgia', serif;
         }
         
         .filter-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--hover-shadow);
+            background: #f8f8f8;
+            border-color: #888888;
+            color: #666;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(136, 136, 136, 0.15);
         }
         
         .filter-button.active {
-            background: linear-gradient(135deg, var(--accent-color), #C2185B);
+            background: #888888;
+            border-color: #888888;
+            color: white;
+            box-shadow: 0 2px 12px rgba(136, 136, 136, 0.25);
         }
         
-        .filter-button.all { background: linear-gradient(135deg, var(--primary-color), #388E3C); }
-        .filter-button.special { background: linear-gradient(135deg, #FF9800, #F57C00); }
-        .filter-button.food { background: linear-gradient(135deg, var(--secondary-color), #1976D2); }
-        .filter-button.drinks { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
-        .filter-button.wine { background: linear-gradient(135deg, #795548, #5D4037); }
+        .filter-button.active:hover {
+            background: #777;
+            border-color: #777;
+            color: white;
+        }
         
         .menu-container {
             display: grid;
@@ -457,7 +517,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         .section-title {
             font-size: 1.5em;
             font-weight: 600;
-            color: var(--primary-color);
+            color: var(--text-color);
             margin-bottom: 5px;
         }
         
@@ -618,9 +678,10 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         }
         
         .item-price {
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 1.2em;
+            color: var(--text-color);
+            opacity: 0.75;
+            font-weight: 500;
+            font-size: 1.1em;
             margin-left: 15px;
             white-space: nowrap;
         }
@@ -747,8 +808,9 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         }
         
         .featured-item-price {
-            color: var(--accent-color);
-            font-weight: bold;
+            color: var(--text-color);
+            opacity: 0.75;
+            font-weight: 500;
         }
         
         .restaurant-info {
@@ -843,11 +905,12 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         
         .main-image {
             width: 100%;
-            max-height: 300px;
-            object-fit: cover;
+            max-height: 400px;
+            object-fit: contain;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             margin-bottom: 10px;
+            background-color: #f8f9fa;
         }
         
         .image-thumbnails {
@@ -905,8 +968,9 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
         
         .price-display {
             font-size: 2em;
-            font-weight: bold;
-            color: var(--accent-color);
+            font-weight: 500;
+            color: var(--text-color);
+            opacity: 0.75;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -1043,9 +1107,9 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
 
         <div class="menu-filters dietary-filters">
             <button class="filter-button dietary active" data-dietary="all">All Items</button>
+            <button class="filter-button dietary" data-dietary="sushi_tapas">🍣 Sushi</button>
             <button class="filter-button dietary" data-dietary="gluten_free">🌾 Gluten-Free</button>
             <button class="filter-button dietary" data-dietary="vegan">🌱 Vegan</button>
-            <button class="filter-button dietary" data-dietary="spicy">🌶️ Spicy</button>
             <button class="filter-button dietary" data-dietary="popular">🔥 Popular</button>
         </div>
         
@@ -1131,7 +1195,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                                                     <?php endif; ?>
                                                 </div>
                                                 <?php if ($item['price']): ?>
-                                                    <div class="item-price">$<?= number_format($item['price'], 2) ?></div>
+                                                    <div class="item-price">$<?= formatPrice($item['price']) ?></div>
                                                 <?php endif; ?>
                                             </div>
                                         <?php endforeach; ?>
@@ -1167,7 +1231,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                             <div class="featured-item-info">
                                 <div class="featured-item-name"><?= htmlspecialchars($item['item_name']) ?></div>
                                 <?php if ($item['price']): ?>
-                                    <div class="featured-item-price">$<?= number_format($item['price'], 2) ?></div>
+                                    <div class="featured-item-price">$<?= formatPrice($item['price']) ?></div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -1223,8 +1287,8 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
 
         // Use event delegation - attach listeners to document body
         document.addEventListener('click', function(event) {
-            // Handle menu filter buttons
-            if (event.target.matches('.menu-filters .filter-button')) {
+            // Handle menu filter buttons (but not dietary filter buttons)
+            if (event.target.matches('.filter-button') && event.target.hasAttribute('data-menu')) {
                 event.preventDefault();
                 console.log('Menu button clicked via delegation:', event.target.dataset.menu);
                 
@@ -1247,10 +1311,13 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                 return;
             }
             
-            // Handle dietary filter buttons
-            if (event.target.matches('.dietary-filters .filter-button')) {
+            // Handle dietary filter buttons (but not menu filter buttons)
+            if (event.target.matches('.filter-button') && event.target.hasAttribute('data-dietary')) {
                 event.preventDefault();
                 console.log('Dietary button clicked via delegation:', event.target.dataset.dietary);
+                console.log('basePath:', basePath);
+                console.log('currentMenuFilter before:', currentMenuFilter);
+                console.log('currentDietaryFilter before:', currentDietaryFilter);
                 
                 currentDietaryFilter = event.target.dataset.dietary;
                 document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => btn.classList.remove('active'));
@@ -1258,20 +1325,39 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                 
                 if(currentDietaryFilter === 'all') {
                     // Clear URL parameters for "All Items"
-                    history.pushState({}, '', basePath + 'menu');
+                    const newUrl = basePath + 'menu';
+                    console.log('Setting URL to (all):', newUrl);
+                    history.pushState({}, '', newUrl);
+                    currentMenuFilter = 'all';
+                    document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
+                    const allBtn = document.querySelector('.menu-filters .filter-button.all');
+                    if (allBtn) allBtn.classList.add('active');
+                    fetchMenuData();
+                } else if(currentDietaryFilter === 'sushi_tapas') {
+                    // Special handling for sushi filter - use clean URL
+                    const newUrl = basePath + 'menu/sushi';
+                    console.log('Setting URL to (sushi):', newUrl);
+                    history.pushState({}, '', newUrl);
                     currentMenuFilter = 'all';
                     document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
                     const allBtn = document.querySelector('.menu-filters .filter-button.all');
                     if (allBtn) allBtn.classList.add('active');
                     fetchMenuData();
                 } else {
-                    // Set menu to "all" for dietary filters to show items across all menus
+                    // For other dietary filters, stay on /menu with query parameters
+                    const newUrl = basePath + 'menu?dietary=' + encodeURIComponent(currentDietaryFilter);
+                    console.log('Setting URL to (other):', newUrl);
+                    history.pushState({}, '', newUrl);
                     currentMenuFilter = 'all';
                     document.querySelectorAll('.menu-filters .filter-button').forEach(btn => btn.classList.remove('active'));
                     const allBtn = document.querySelector('.menu-filters .filter-button.all');
                     if (allBtn) allBtn.classList.add('active');
                     fetchMenuData();
                 }
+                
+                console.log('After URL update - currentMenuFilter:', currentMenuFilter);
+                console.log('After URL update - currentDietaryFilter:', currentDietaryFilter);
+                console.log('Current window location:', window.location.href);
                 return;
             }
         });
@@ -1285,6 +1371,14 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             if (urlMenuFilter && urlMenuFilter !== currentMenuFilter) {
                 currentMenuFilter = urlMenuFilter;
                 console.log('URL override detected:', urlMenuFilter);
+                
+                // Special handling for sushi URL
+                if (urlMenuFilter === 'sushi') {
+                    currentMenuFilter = 'all';
+                    currentDietaryFilter = 'sushi_tapas';
+                    console.log('Sushi URL detected, setting dietary filter to sushi_tapas');
+                }
+                
                 // Fetch the correct menu data since PHP couldn't parse the URL
                 fetchMenuData();
             }
@@ -1311,6 +1405,26 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                     btn.classList.add('active');
                 }
             });
+            
+            // Special handling for sushi URL - when loading /menu/sushi, we want the sushi dietary filter to be active
+            const currentUrl = window.location.pathname;
+            if (currentUrl === '/menu/sushi' || currentUrl.endsWith('/menu/sushi')) {
+                // Make sure sushi dietary button is active
+                document.querySelectorAll('.dietary-filters .filter-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.dietary === 'sushi_tapas') {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                // Make sure All Menus is active in menu filters
+                document.querySelectorAll('.menu-filters .filter-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.menu === 'all') {
+                        btn.classList.add('active');
+                    }
+                });
+            }
         }
 
         function fetchMenuData() {
@@ -1341,10 +1455,8 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                     console.log('Menu data received:', data);
                     if (data.success) {
                         updatePageContent(data);
-                        // Only update URL if not "All Items" (which clears parameters)
-                        if (currentDietaryFilter !== 'all') {
-                            history.pushState({menu: currentMenuFilter, dietary: currentDietaryFilter}, '', '?menu=' + encodeURIComponent(currentMenuFilter) + '&dietary=' + encodeURIComponent(currentDietaryFilter));
-                        }
+                        // DO NOT update URL here - it's already been set correctly in the button click handlers
+                        // This was causing the menu/undefined issue by overriding clean URLs
                     } else {
                         menuContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;"><h2>Error</h2><p>${data.error || 'Unknown error occurred'}</p></div>`;
                     }
@@ -1454,7 +1566,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                             </div>
                         ` : ''}
                     </div>
-                    ${item.price ? `<div class="item-price">$${parseFloat(item.price).toFixed(2)}</div>` : ''}
+                    ${item.price ? `<div class="item-price">$${formatPrice(item.price)}</div>` : ''}
                 </div>
             `;
         }
@@ -1465,7 +1577,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
                     <img src="${escapeHtml(item.primary_image || 'images/default-featured.png')}" alt="${escapeHtml(item.item_name)}">
                     <div class="featured-item-info">
                         <div class="featured-item-name">${escapeHtml(item.item_name)}</div>
-                        ${item.price ? `<div class="featured-item-price">$${parseFloat(item.price).toFixed(2)}</div>` : ''}
+                        ${item.price ? `<div class="featured-item-price">$${formatPrice(item.price)}</div>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -1588,7 +1700,7 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             html += '<div class="item-meta">';
             
             if (item.price) {
-                html += `<div class="price-display">$${parseFloat(item.price).toFixed(2)}</div>`;
+                html += `<div class="price-display">$${formatPrice(item.price)}</div>`;
             }
             
             if (icons && icons.length > 0) {
@@ -1683,6 +1795,19 @@ $isUserAdmin = Auth::isAuthenticated() && Auth::hasRole('admin');
             }
         }
         
+        /**
+         * Format price to remove trailing zeros (JavaScript version)
+         * Examples: 7.00 -> "7", 7.50 -> "7.50", 12.99 -> "12.99"
+         */
+        function formatPrice(price) {
+            if (!price || price <= 0) {
+                return '';
+            }
+            // Convert to number, format to 2 decimals, then remove trailing zeros
+            const formatted = parseFloat(price).toFixed(2);
+            return formatted.replace(/\.?0+$/, '');
+        }
+        
         // Close lightbox when clicking outside content
         window.onclick = function(event) {
             const lightbox = document.getElementById('itemLightbox');
@@ -1740,5 +1865,16 @@ function getDietaryIconSymbol($iconName) {
         case 'popular': return '🔥';
         default: return '❓';
     }
+}
+
+/**
+ * Format price to remove trailing zeros
+ * Examples: 7.00 -> "7", 7.50 -> "7.50", 12.99 -> "12.99"
+ */
+function formatPrice($price) {
+    if (empty($price) || $price <= 0) {
+        return '';
+    }
+    return rtrim(rtrim(number_format($price, 2), '0'), '.');
 }
 ?>
